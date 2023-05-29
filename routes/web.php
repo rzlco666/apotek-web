@@ -28,8 +28,9 @@ Route::get('/dashboard', [App\Http\Controllers\HomeController::class, 'index'])-
 Route::prefix('obat')->middleware(['auth'])->group(function () {
     //kategori obat
     Route::get('kategori-obat', [KategoriObatController::class, 'index'])->name('kategori-obat');
-    Route::post('store-kategori-obat', [KategoriObatController::class, 'store']);
-    Route::post('edit-kategori-obat', [KategoriObatController::class, 'edit']);
-    Route::post('delete-kategori-obat', [KategoriObatController::class, 'destroy']);
-
+    Route::get('kategori-obat/datatable', [KategoriObatController::class, 'datatable'])->name('kategori-obat-datatable');
+    Route::post('kategori-obat', [KategoriObatController::class, 'store'])->name('kategori-obat-create');
+    Route::get('kategori-obat/{id}', [KategoriObatController::class, 'show'])->name('kategori-obat-detail');
+    Route::post('kategori-obat/{id}', [KategoriObatController::class, 'update'])->name('kategori-obat-update');
+    Route::delete('kategori-obat/{id}', [KategoriObatController::class, 'destroy'])->name('kategori-obat-delete');
 });

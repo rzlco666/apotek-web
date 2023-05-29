@@ -1,5 +1,12 @@
   <!-- latest jquery-->
   <script src="{{ asset('assets/js/jquery-3.6.0.min.js') }}"></script>
+  <script type="text/javascript">
+      $.ajaxSetup({
+          headers: {
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          }
+      });
+  </script>
   <!-- Bootstrap js-->
   <script src="{{ asset('assets/js/bootstrap/bootstrap.bundle.min.js') }}"></script>
   <!-- feather icon js-->
@@ -11,6 +18,8 @@
   <!-- Sidebar jquery-->
   <script src="{{ asset('assets/js/config.js') }}"></script>
   <script src="{{ asset('assets/js/sidebar-menu.js') }}"></script>
+
+  <script src="{{ asset('assets/js/sweetalert2@11.js') }}"></script>
 
   {{-- scripts includes --}}
   @yield('scripts')

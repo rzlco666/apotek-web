@@ -16,14 +16,6 @@
     <div class="container-fluid">
         <div class="page-title">
             <div class="row">
-                <div class="col-sm-12">
-                    @if ($message = Session::get('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            <strong>Success!</strong> {{ $message }}
-                            <button class="btn-close" type="button" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    @endif
-                </div>
                 <div class="col-sm-6">
                     <h3>@yield('title')</h3>
                 </div>
@@ -43,87 +35,81 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        <a class="btn btn-outline-primary btn-sm" onClick="add()" href="javascript:void(0)">Tambah @yield('title')</a>
+                        @if (Auth::user()->can('create kategori obat'))
+                            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#form-modal">
+                                <i class="icon-plus"></i> Tambah @yield('title')
+                            </button>
+                        @endif
                     </div>
                     <div class="card-body">
-                        <table class="table table-bordered" id="ajax-crud-datatable">
+                        <table class="table table-bordered" id="datatable">
                             <thead>
                             <tr class="border-bottom-primary">
                                 <th scope="col">No</th>
-                                <th scope="col">Nama Kategori</th>
                                 <th scope="col">Aksi</th>
+                                <th scope="col">Nama Kategori</th>
+                                <th scope="col">Updated By</th>
                             </tr>
                             </thead>
+                            <tbody>
+                            {{-- table content --}}
+                            </tbody>
                         </table>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- boostrap company model -->
-    <div class="modal fade" id="company-modal" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+    {{-- modal Add Data --}}
+    <div class="modal fade" id="form-modal"  role="dialog" aria-labelledby="modal-form-label" aria-hidden="true">
+        <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="CompanyModal"></h4>
+                    <h5 class="modal-title" id="modal-form-label">Add {{ __('Data') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+
+                    </button>
                 </div>
                 <div class="modal-body">
-                    <form action="javascript:void(0)" id="CompanyForm" name="CompanyForm" class="form-horizontal" method="POST" enctype="multipart/form-data">
-                        <input type="hidden" name="id" id="id">
+                    <form id="form-input">
+                        <input type="hidden" name="kategori_obat_id" id="kategori-obat-id">
                         <div class="form-group">
-                            <label for="name" class="col-sm-2 control-label">Company Name</label>
-                            <div class="col-sm-12">
-                                <input type="text" class="form-control" id="name" name="name" placeholder="Enter Company Name" maxlength="50" required="">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="name" class="col-sm-2 control-label">Company Email</label>
-                            <div class="col-sm-12">
-                                <input type="email" class="form-control" id="email" name="email" placeholder="Enter Company Email" maxlength="50" required="">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label">Company Address</label>
-                            <div class="col-sm-12">
-                                <input type="text" class="form-control" id="address" name="address" placeholder="Enter Company Address" required="">
-                            </div>
-                        </div>
-                        <div class="col-sm-offset-2 col-sm-10">
-                            <button type="submit" class="btn btn-primary" id="btn-save">Save changes
-                            </button>
+                            <label>{{ __('Nama Kategori Obat') }} <span class="text-danger">*</span></label>
+                            <input type="text" name="nama_kategori" id="nama-kategori" class="form-control" required>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="save-btn" class="btn btn-sm btn-primary">Submit</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="kategori-obat-modal" tabindex="-1" role="dialog">
+    {{-- modal Detail --}}
+    <div class="modal fade" id="detail-modal"  role="dialog" aria-labelledby="modal-detail-label" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="KategoriObatModal"></h5>
-                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close" data-bs-original-title="" title=""></button>
+                    <h5 class="modal-title" id="modal-detail-label">Detail {{ __('Data') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+
+                    </button>
                 </div>
-                <form action="javascript:void(0)" id="KategoriObatForm" name="KategoriObatForm" method="POST" enctype="multipart/form-data">
                 <div class="modal-body">
-                        <input type="hidden" name="id" id="id">
-                        <div class="mb-3">
-                            <label class="col-form-label">Nama Kategori :</label>
-                            <input class="form-control" type="text" id="nama-kategori-obat" name="nama_kategori" placeholder="Masukkan Nama Kategori Obat">
-                        </div>
+                    <div class="form-group">
+                        <label>{{ __('Nama Kategori') }}</label>
+                        <p id="detail-kategori-obat" class="form-control"></p>
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal" data-bs-original-title="" title="">Close</button>
-                    <button class="btn btn-primary" type="submit" id="btn-save">Submit</button>
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
                 </div>
-                </form>
             </div>
         </div>
     </div>
-    <!-- end bootstrap model -->
+
 @endsection
 
 @section('scripts')
@@ -132,81 +118,165 @@
     <script src="{{ asset('assets/js/tooltip-init.js') }}"></script>
 
     <script type="text/javascript">
-        $(document).ready( function () {
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
-            $('#ajax-crud-datatable').DataTable({
+        $(document).ready(function () {
+            var datatable = $('#datatable').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ url('obat/kategori-obat') }}",
+                ajax: '{{ route('kategori-obat-datatable') }}',
                 columns: [
-                    { data: 'id', name: 'id' },
+                    { data: 'DT_RowIndex' },
+                    { data: 'action', name: 'action' },
                     { data: 'nama_kategori', name: 'nama_kategori' },
-                    {data: 'action', name: 'action', orderable: false},
-                ],
-                order: [[0, 'desc']]
+                    { data: 'last_modified', name: 'last_modified' }
+                ]
             });
-        });
-        function add(){
-            $('#KategoriObatForm').trigger("reset");
-            $('#KategoriObatModal').html("Tambah Kategori Obat");
-            $('#kategori-obat-modal').modal('show');
-            $('#id').val('');
-        }
-        function editFunc(id){
-            $.ajax({
-                type:"POST",
-                url: "{{ url('obat/edit-kategori-obat') }}",
-                data: { id: id },
-                dataType: 'json',
-                success: function(res){
-                    $('#KategoriObatModal').html("Edit Kategori Obat");
-                    $('#kategori-obat-modal').modal('show');
-                    $('#id').val(res.id);
-                    $('#nama-kategori-obat').val(res.nama_kategori);
+
+
+            $('#form-modal').on('show.bs.modal', function(){
+                $.fn.modal.Constructor.prototype._enforceFocus = function() {};
+            })
+
+            $('#form-modal').on('hidden.bs.modal', function() {
+                $('#kategori-obat-id').val('')
+                $('#modal-form-label').text('Add Kategori Obat')
+                $('#nama-kategori').val('')
+            })
+
+            $(document).on('click', '.edit-btn', function() {
+                let id = $(this).data('id')
+                let url = '{{ route('kategori-obat-detail', ':id') }}'
+                url = url.replace(':id', id)
+                $('#kategori-obat-id').val(id)
+                $('#modal-form-label').text('Edit {{ __('Kategori Obat') }}')
+
+                $.get(url, function(response) {
+                    let data = response.data
+                    $('#nama-kategori').val(data.nama_kategori)
+
+                    $('#form-modal').modal('show')
+                }).fail((err) => {
+                    Swal.fire({
+                        title: 'Error',
+                        text: err.responseJSON.message,
+                        icon: 'error',
+                        confirmButtonText: 'Ok'
+                    })
+                })
+
+            })
+
+            $(document).on('click', '.detail-btn', function() {
+                let id = $(this).data('id')
+                let url = '{{ route('kategori-obat-detail', ':id') }}'
+                url = url.replace(':id', id)
+
+                $.get(url, function(response) {
+                    let data = response.data
+                    $('#detail-kategori-obat').html(data.nama_kategori)
+
+                    $('#detail-modal').modal('show')
+                }).fail((err) => {
+                    Swal.fire({
+                        title: 'Error',
+                        text: err.responseJSON.message,
+                        icon: 'error',
+                        confirmButtonText: 'Ok'
+                    })
+                })
+
+            })
+
+            $('#save-btn').on('click', function() {
+                let params = new FormData($('#form-input')[0])
+                let url = '{{ route('kategori-obat-create') }}'
+                let kategori_obat_id = $('#kategori-obat-id').val()
+
+                if (kategori_obat_id !== '') {
+                    url = '{{ route('kategori-obat-update', ':id') }}'
+                    url = url.replace(':id', kategori_obat_id)
                 }
-            });
-        }
-        function deleteFunc(id){
-            if (confirm("Delete Record?") == true) {
-                var id = id;
-                // ajax
+
                 $.ajax({
-                    type:"POST",
-                    url: "{{ url('obat/delete-kategori-obat') }}",
-                    data: { id: id },
-                    dataType: 'json',
-                    success: function(res){
-                        var oTable = $('#ajax-crud-datatable').dataTable();
-                        oTable.fnDraw(false);
+                    url: url,
+                    data: params,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    method: 'POST',
+                    success: function(response) {
+                        Swal.fire({
+                            title: 'Success',
+                            text: response.message,
+                            icon: 'success',
+                            confirmButtonText: 'Ok'
+                        })
+                        datatable.ajax.reload(null, false)
+                        $('#form-modal').modal('hide')
+                        $('.modal-backdrop').hide()
+                        $('body').removeAttr('style')
+                    },
+                    error: function(err) {
+                        Swal.fire({
+                            title: 'Error',
+                            text: err.responseJSON.message,
+                            icon: 'error',
+                            confirmButtonText: 'Ok'
+                        })
                     }
                 });
-            }
-        }
-        $('#KategoriObatForm').submit(function(e) {
-            e.preventDefault();
-            var formData = new FormData(this);
-            $.ajax({
-                type:'POST',
-                url: "{{ url('obat/store-kategori-obat')}}",
-                data: formData,
-                cache:false,
-                contentType: false,
-                processData: false,
-                success: (data) => {
-                    $("#kategori-obat-modal").modal('hide');
-                    var oTable = $('#ajax-crud-datatable').dataTable();
-                    oTable.fnDraw(false);
-                    $("#btn-save").html('Submit');
-                    $("#btn-save"). attr("disabled", false);
-                },
-                error: function(data){
-                    console.log(data);
-                }
-            });
+            })
+
+            $(document).on('click', '.delete-btn', function() {
+                let id = $(this).data('id')
+                let url = '{{ route('kategori-obat-delete', ':id') }}'
+                url = url.replace(':id', id)
+
+                Swal.fire({
+                    title: 'Konfirmasi',
+                    text: 'Apakah anda yakin akan menghapus data ini?',
+                    icon: 'warning',
+                    confirmButtonText: 'Ya',
+                    denyButtonText: `Tidak`,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: url,
+                            method: 'DELETE',
+                            success: function(response) {
+                                if (response.status == false) {
+                                    Swal.fire({
+                                        title: 'Error',
+                                        text: response.message,
+                                        icon: 'error',
+                                        confirmButtonText: 'Ok'
+                                    })
+                                    return false
+                                }
+
+                                Swal.fire({
+                                    title: 'Success',
+                                    text: response.message,
+                                    icon: 'success',
+                                    confirmButtonText: 'Ok'
+                                }).then((result) => {
+                                    datatable.ajax.reload(null, false)
+                                })
+                            },
+                            error: function(e) {
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: e.responseJSON.message,
+                                    icon: 'error',
+                                    confirmButtonText: 'Ok'
+                                })
+                                return false
+                            }
+                        })
+                    }
+                })
+
+            })
         });
     </script>
+
 @endsection
