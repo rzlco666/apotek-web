@@ -28,6 +28,10 @@ class PermissionSeeder extends Seeder
         Permission::create(['name' => 'create kategori obat']);
         Permission::create(['name' => 'edit kategori obat']);
         Permission::create(['name' => 'delete kategori obat']);
+        Permission::create(['name' => 'view supplier']);
+        Permission::create(['name' => 'create supplier']);
+        Permission::create(['name' => 'edit supplier']);
+        Permission::create(['name' => 'delete supplier']);
 
         //create roles and assign existing permissions
         $adminRole = Role::create(['name' => 'admin']);
@@ -37,6 +41,9 @@ class PermissionSeeder extends Seeder
         $adminRole->givePermissionTo('view kategori obat');
         $adminRole->givePermissionTo('create kategori obat');
         $adminRole->givePermissionTo('edit kategori obat');
+        $adminRole->givePermissionTo('view supplier');
+        $adminRole->givePermissionTo('create supplier');
+        $adminRole->givePermissionTo('edit supplier');
 
         $superadminRole = Role::create(['name' => 'super-admin']);
         // gets all permissions via Gate::before rule
