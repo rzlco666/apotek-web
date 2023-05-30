@@ -45,7 +45,7 @@
                         <table class="table table-bordered" id="datatable">
                             <thead>
                             <tr class="border-bottom-primary">
-                                <th scope="col">No</th>
+                                <th scope="col" width="20px">No</th>
                                 <th scope="col">Aksi</th>
                                 <th scope="col">Nama Kategori</th>
                                 <th scope="col">Updated By</th>
@@ -140,6 +140,9 @@
                 $('#kategori-obat-id').val('')
                 $('#modal-form-label').text('Add Kategori Obat')
                 $('#nama-kategori').val('')
+
+                $('.modal-backdrop').remove();
+                $('body').removeClass('modal-open');
             })
 
             $(document).on('click', '.edit-btn', function() {
@@ -211,9 +214,19 @@
                             confirmButtonText: 'Ok'
                         })
                         datatable.ajax.reload(null, false)
+
                         $('#form-modal').modal('hide')
-                        $('.modal-backdrop').hide()
+                        $('.modal-backdrop').remove()
+                        $('body').removeClass('modal-open')
                         $('body').removeAttr('style')
+
+                        // Reset modal state after hiding
+                        setTimeout(function(){
+                            $('#form-modal').removeClass('show');
+                            $('.modal-backdrop').remove();
+                            $('body').removeClass('modal-open');
+                            $('body').css('padding-right', '');
+                        }, 500);
                     },
                     error: function(err) {
                         Swal.fire({

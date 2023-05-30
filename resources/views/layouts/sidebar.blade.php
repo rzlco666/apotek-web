@@ -23,7 +23,7 @@
               <li class="sidebar-list">
                   <i class="fa fa-thumb-tack"></i><a class="sidebar-link sidebar-title" href="javascript:void(0)"><i data-feather="box"></i><span>Obat</span></a>
               <ul class="sidebar-submenu">
-                  <li><a href="#">Data Obat</a></li>
+                  <li><a href="{{ route('data-obat') }}">Data Obat</a></li>
                   <li><a href="#">Obat Masuk</a></li>
                   <li><a href="#">Obat Keluar</a></li>
                   <li><a href="#">Obat Kadaluwarsa</a></li>
