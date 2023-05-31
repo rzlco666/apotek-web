@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Obat\DataObatController;
+use App\Http\Controllers\Obat\ExpObatController;
 use App\Http\Controllers\Obat\KategoriObatController;
 use App\Http\Controllers\Supplier\SupplierController;
 use Illuminate\Support\Facades\Auth;
@@ -43,6 +44,14 @@ Route::prefix('obat')->middleware(['auth'])->group(function () {
     Route::get('data-obat/{id}', [DataObatController::class, 'show'])->name('data-obat-detail');
     Route::post('data-obat/{id}', [DataObatController::class, 'update'])->name('data-obat-update');
     Route::delete('data-obat/{id}', [DataObatController::class, 'destroy'])->name('data-obat-delete');
+
+    //exp obat
+    Route::get('exp-obat', [ExpObatController::class, 'index'])->name('exp-obat');
+    Route::get('exp-obat/datatable', [ExpObatController::class, 'datatable'])->name('exp-obat-datatable');
+    Route::post('exp-obat', [ExpObatController::class, 'store'])->name('exp-obat-create');
+    Route::get('exp-obat/{id}', [ExpObatController::class, 'show'])->name('exp-obat-detail');
+    Route::post('exp-obat/{id}', [ExpObatController::class, 'update'])->name('exp-obat-update');
+    Route::delete('exp-obat/{id}', [ExpObatController::class, 'destroy'])->name('exp-obat-delete');
 });
 
 Route::prefix('supplier')->middleware(['auth'])->group(function () {

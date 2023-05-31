@@ -26,7 +26,7 @@
                   <li><a href="{{ route('data-obat') }}">Data Obat</a></li>
                   <li><a href="#">Obat Masuk</a></li>
                   <li><a href="#">Obat Keluar</a></li>
-                  <li><a href="#">Obat Kadaluwarsa</a></li>
+                  <li><a href="{{ route('exp-obat') }}">Obat Kadaluwarsa</a></li>
                   <li><a href="#">Stok Obat</a></li>
                   <li><a href="{{ route('kategori-obat') }}">Kategori Obat</a></li>
               </ul>
