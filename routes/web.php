@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Faktur\DataFakturController;
 use App\Http\Controllers\Obat\DataObatController;
 use App\Http\Controllers\Obat\ExpObatController;
 use App\Http\Controllers\Obat\InObatController;
@@ -80,4 +81,14 @@ Route::prefix('supplier')->middleware(['auth'])->group(function () {
     Route::get('supplier/{id}', [SupplierController::class, 'show'])->name('supplier-detail');
     Route::post('supplier/{id}', [SupplierController::class, 'update'])->name('supplier-update');
     Route::delete('supplier/{id}', [SupplierController::class, 'destroy'])->name('supplier-delete');
+});
+
+Route::prefix('faktur')->middleware(['auth'])->group(function () {
+    //kategori obat
+    Route::get('data-faktur', [DataFakturController::class, 'index'])->name('data-faktur');
+    Route::get('data-faktur/datatable', [DataFakturController::class, 'datatable'])->name('data-faktur-datatable');
+    Route::post('data-faktur', [DataFakturController::class, 'store'])->name('data-faktur-create');
+    Route::get('data-faktur/{id}', [DataFakturController::class, 'show'])->name('data-faktur-detail');
+    Route::post('data-faktur/{id}', [DataFakturController::class, 'update'])->name('data-faktur-update');
+    Route::delete('data-faktur/{id}', [DataFakturController::class, 'destroy'])->name('data-faktur-delete');
 });

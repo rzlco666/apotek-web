@@ -18,7 +18,7 @@
             </li>
             <hr>
             <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a class="sidebar-link sidebar-title link-nav" href="{{ route('dashboard') }}"><i data-feather="home"> </i><span>Dashboard</span></a></li>
-            <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a class="sidebar-link sidebar-title link-nav" href="#"><i data-feather="inbox"> </i><span>Data Faktur</span></a></li>
+            <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a class="sidebar-link sidebar-title link-nav" href="{{ route('data-faktur') }}"><i data-feather="inbox"> </i><span>Data Faktur</span></a></li>
             <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a class="sidebar-link sidebar-title link-nav" href="{{ route('supplier') }}"><i data-feather="truck"> </i><span>Supplier</span></a></li>
               <li class="sidebar-list">
                   <i class="fa fa-thumb-tack"></i><a class="sidebar-link sidebar-title" href="javascript:void(0)"><i data-feather="box"></i><span>Obat</span></a>
