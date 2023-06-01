@@ -6,6 +6,7 @@ use App\Http\Controllers\Obat\ExpObatController;
 use App\Http\Controllers\Obat\InObatController;
 use App\Http\Controllers\Obat\KategoriObatController;
 use App\Http\Controllers\Obat\OutObatController;
+use App\Http\Controllers\Obat\StokObatController;
 use App\Http\Controllers\Supplier\SupplierController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -71,6 +72,11 @@ Route::prefix('obat')->middleware(['auth'])->group(function () {
     Route::get('out-obat/{id}', [OutObatController::class, 'show'])->name('out-obat-detail');
     Route::post('out-obat/{id}', [OutObatController::class, 'update'])->name('out-obat-update');
     Route::delete('out-obat/{id}', [OutObatController::class, 'destroy'])->name('out-obat-delete');
+
+    //stok obat
+    Route::get('stok-obat', [StokObatController::class, 'index'])->name('stok-obat');
+    Route::get('stok-obat/datatable', [StokObatController::class, 'datatable'])->name('stok-obat-datatable');
+    Route::get('stok-obat/{id}', [StokObatController::class, 'show'])->name('stok-obat-detail');
 });
 
 Route::prefix('supplier')->middleware(['auth'])->group(function () {
