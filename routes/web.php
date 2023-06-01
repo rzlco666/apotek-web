@@ -7,6 +7,7 @@ use App\Http\Controllers\Obat\InObatController;
 use App\Http\Controllers\Obat\KategoriObatController;
 use App\Http\Controllers\Obat\OutObatController;
 use App\Http\Controllers\Obat\StokObatController;
+use App\Http\Controllers\Pesanan\SuratPesananController;
 use App\Http\Controllers\Supplier\SupplierController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -97,4 +98,14 @@ Route::prefix('faktur')->middleware(['auth'])->group(function () {
     Route::get('data-faktur/{id}', [DataFakturController::class, 'show'])->name('data-faktur-detail');
     Route::post('data-faktur/{id}', [DataFakturController::class, 'update'])->name('data-faktur-update');
     Route::delete('data-faktur/{id}', [DataFakturController::class, 'destroy'])->name('data-faktur-delete');
+});
+
+Route::prefix('pesanan')->middleware(['auth'])->group(function () {
+    //kategori obat
+    Route::get('surat-pesanan', [SuratPesananController::class, 'index'])->name('surat-pesanan');
+    Route::get('surat-pesanan/datatable', [SuratPesananController::class, 'datatable'])->name('surat-pesanan-datatable');
+    Route::post('surat-pesanan', [SuratPesananController::class, 'store'])->name('surat-pesanan-create');
+    Route::get('surat-pesanan/{id}', [SuratPesananController::class, 'show'])->name('surat-pesanan-detail');
+    Route::post('surat-pesanan/{id}', [SuratPesananController::class, 'update'])->name('surat-pesanan-update');
+    Route::delete('surat-pesanan/{id}', [SuratPesananController::class, 'destroy'])->name('surat-pesanan-delete');
 });
