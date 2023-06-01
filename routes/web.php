@@ -4,6 +4,7 @@ use App\Http\Controllers\Obat\DataObatController;
 use App\Http\Controllers\Obat\ExpObatController;
 use App\Http\Controllers\Obat\InObatController;
 use App\Http\Controllers\Obat\KategoriObatController;
+use App\Http\Controllers\Obat\OutObatController;
 use App\Http\Controllers\Supplier\SupplierController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -61,6 +62,14 @@ Route::prefix('obat')->middleware(['auth'])->group(function () {
     Route::get('in-obat/{id}', [InObatController::class, 'show'])->name('in-obat-detail');
     Route::post('in-obat/{id}', [InObatController::class, 'update'])->name('in-obat-update');
     Route::delete('in-obat/{id}', [InObatController::class, 'destroy'])->name('in-obat-delete');
+
+    //out obat
+    Route::get('out-obat', [OutObatController::class, 'index'])->name('out-obat');
+    Route::get('out-obat/datatable', [OutObatController::class, 'datatable'])->name('out-obat-datatable');
+    Route::post('out-obat', [OutObatController::class, 'store'])->name('out-obat-create');
+    Route::get('out-obat/{id}', [OutObatController::class, 'show'])->name('out-obat-detail');
+    Route::post('out-obat/{id}', [OutObatController::class, 'update'])->name('out-obat-update');
+    Route::delete('out-obat/{id}', [OutObatController::class, 'destroy'])->name('out-obat-delete');
 });
 
 Route::prefix('supplier')->middleware(['auth'])->group(function () {
