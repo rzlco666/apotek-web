@@ -33,7 +33,7 @@ class StokObatController extends Controller
         $data = StokObat::with('category_obat', 'exp_obat', 'in_obat', 'out_obat')->get();
 
         $actions = '
-                    <button type="button" class="btn btn-info btn-sm detail-btn me-1" data-id="{{ $id }}" title="Detail">
+                    <button type="button" class="btn btn-info btn-xs detail-btn me-1" data-id="{{ $id }}" title="Detail">
                         <i class="icon-eye"></i>
                     </button>
                     ';

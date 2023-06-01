@@ -37,18 +37,17 @@ class DataFakturController extends Controller
     {
         $data = DataFaktur::with('data_obat', 'data_supplier')->get();
 
-        $actions = '
-                    <button type="button" class="btn btn-info btn-sm detail-btn me-1" data-id="{{ $id }}" title="Detail">
+        $actions = '<button type="button" class="btn btn-info btn-xs detail-btn me-1" data-id="{{ $id }}" title="Detail">
                         <i class="icon-eye"></i>
                     </button>
                     ';
         if (Auth::user()->can('edit obat')) {
-            $actions .= '<button class="btn btn-sm btn-warning edit-btn me-1" data-id="{{ $id }}" title="Edit">
+            $actions .= '<button class="btn btn-xs btn-warning edit-btn me-1" data-id="{{ $id }}" title="Edit">
                             <i class="icon-pencil"></i>
                         </button>';
         }
         if (Auth::user()->can('delete obat')) {
-            $actions .= '<button class="btn btn-sm btn-danger delete-btn me-1" data-id="{{ $id }}" title="Delete">
+            $actions .= '<button class="btn btn-xs btn-danger delete-btn me-1" data-id="{{ $id }}" title="Delete">
                             <i class="icon-trash"></i>
                         </button>';
         }
