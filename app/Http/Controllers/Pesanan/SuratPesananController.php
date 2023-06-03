@@ -39,6 +39,10 @@ class SuratPesananController extends Controller
                     <button type="button" class="btn btn-info btn-xs detail-btn me-1" data-id="{{ $id }}" title="Detail">
                         <i class="icon-eye"></i>
                     </button>
+
+                    <button type="button" class="btn btn-primary btn-xs print-btn me-1" data-id="{{ $id }}" title="Print">
+                        <i class="icon-printer"></i>
+                    </button>
                     ';
         if (Auth::user()->can('edit obat')) {
             $actions .= '<button class="btn btn-xs btn-warning edit-btn me-1" data-id="{{ $id }}" title="Edit">
@@ -74,8 +78,8 @@ class SuratPesananController extends Controller
         $validated = $request->validate([
             'nama_perusahaan' => 'required',
             'tanggal_pesanan' => 'required',
-            'jumlah_out' => 'required',
-            'obat_id' => 'required',
+            'obat_id.*' => 'required',
+            'jumlah_out.*' => 'required',
         ]);
 
         if (!$validated) {
@@ -91,14 +95,24 @@ class SuratPesananController extends Controller
         $params = [
             'nama_perusahaan' => $request->nama_perusahaan,
             'tanggal_pesanan' => $request->tanggal_pesanan,
-            'jumlah_out' => $request->jumlah_out,
-            'obat_id' => $request->obat_id,
             'created_by' => Auth::user()->id
         ];
 
-        $ref_kategori = SuratPesanan::create($params);
+        $suratPesanan = SuratPesanan::create($params);
 
-        if ($ref_kategori) {
+        if ($suratPesanan) {
+            $obatData = [];
+            foreach ($request->obat_id as $index => $obatId) {
+                $obatArr = explode('-', $obatId);
+                $obatData[] = [
+                    'obat_id' => $obatArr[0],
+                    'nama_obat' => $obatArr[1],
+                    'jumlah_out' => $request->jumlah_out[$index]
+                ];
+            }
+            $suratPesanan->obat = $obatData;
+            $suratPesanan->save();
+
             $result = [
                 'code' => 200,
                 'status' => true,
@@ -144,6 +158,18 @@ class SuratPesananController extends Controller
     }
 
     /**
+     * Display a listing of the resource.
+     *
+     * @return JsonResponse
+     */
+    public function pdf($id)
+    {
+        $data = SuratPesanan::where('id', $id)->with('data_obat', 'data_obat.category_obat')->first();
+
+        return view('pesanan.surat_pesanan.pdf', compact('data'));
+    }
+
+    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -155,8 +181,8 @@ class SuratPesananController extends Controller
         $validated = $request->validate([
             'nama_perusahaan' => 'required',
             'tanggal_pesanan' => 'required',
-            'jumlah_out' => 'required',
-            'obat_id' => 'required',
+            'obat_id.*' => 'required',
+            'jumlah_out.*' => 'required',
         ]);
 
         if (!$validated) {
@@ -169,9 +195,9 @@ class SuratPesananController extends Controller
             return response()->json($result, $result['code']);
         }
 
-        $ref_kategori = SuratPesanan::where('id', $id)->first();
+        $suratPesanan = SuratPesanan::find($id);
 
-        if (!$ref_kategori) {
+        if (!$suratPesanan) {
             $result = [
                 'code' => 404,
                 'status' => false,
@@ -180,13 +206,22 @@ class SuratPesananController extends Controller
             return response()->json($result, $result['code']);
         }
 
-        $ref_kategori->nama_perusahaan = $request->nama_perusahaan;
-        $ref_kategori->tanggal_pesanan = $request->tanggal_pesanan;
-        $ref_kategori->jumlah_out = $request->jumlah_out;
-        $ref_kategori->obat_id = $request->obat_id;
-        $ref_kategori->updated_by = Auth::user()->id;
+        $suratPesanan->nama_perusahaan = $request->nama_perusahaan;
+        $suratPesanan->tanggal_pesanan = $request->tanggal_pesanan;
 
-        if ($ref_kategori->save()) {
+        if ($suratPesanan) {
+            $obatData = [];
+            foreach ($request->obat_id as $index => $obatId) {
+                $obatArr = explode('-', $obatId);
+                $obatData[] = [
+                    'obat_id' => $obatArr[0],
+                    'nama_obat' => $obatArr[1],
+                    'jumlah_out' => $request->jumlah_out[$index]
+                ];
+            }
+            $suratPesanan->obat = $obatData;
+            $suratPesanan->save();
+
             $result = [
                 'code' => 200,
                 'status' => true,

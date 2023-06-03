@@ -108,4 +108,5 @@ Route::prefix('pesanan')->middleware(['auth'])->group(function () {
     Route::get('surat-pesanan/{id}', [SuratPesananController::class, 'show'])->name('surat-pesanan-detail');
     Route::post('surat-pesanan/{id}', [SuratPesananController::class, 'update'])->name('surat-pesanan-update');
     Route::delete('surat-pesanan/{id}', [SuratPesananController::class, 'destroy'])->name('surat-pesanan-delete');
+    Route::get('surat-pesanan/pdf/{id}', [SuratPesananController::class, 'pdf'])->name('surat-pesanan-pdf');
 });

@@ -47,7 +47,6 @@
                                 <th scope="col">Nama Perusahaan</th>
                                 <th scope="col">Tanggal Pesanan</th>
                                 <th scope="col">Obat</th>
-                                <th scope="col">Jumlah Pesan</th>
                                 <th scope="col">Updated By</th>
                             </tr>
                             </thead>
@@ -82,18 +81,27 @@
                             <input type="text" name="tanggal_pesanan" id="tanggal-pesanan" data-date-format="yyyy-mm-dd" class="form-control digits" required>
                         </div>
                         <div class="form-group">
-                            <label>{{ __('Jumlah Pesan') }} <span class="text-danger">*</span></label>
-                            <input type="number" name="jumlah_out" id="jumlah-out" class="form-control" required>
+                            <button type="button" value="tambah" id="add-button" class="btn btn-primary btn-xs">
+                                <i class="icon-plus"></i>
+                            </button>
                         </div>
-                        <div class="form-group">
-                            <label>{{ __('Obat') }} <span class="text-danger">*</span></label>
-                            <select class="form-control select2" name="obat_id" id="obat-id" required>
-                            @if ($data_obat)
-                                @foreach ($data_obat as $row)
-                                        <option value="{{ $row->id }}">{{ $row->kode_obat }} - {{ $row->nama_obat }}</option>
-                                    @endforeach
-                                @endif
-                            </select>
+                        <div id="tambah-input">
+                            <div class="form-group row" id="obat-row-0">
+                                <div class="col-md-6">
+                                    <label>{{ __('Obat') }} <span class="text-danger">*</span></label>
+                                    <select class="form-control select2 obat" name="obat_id[]" required>
+                                        @if ($data_obat)
+                                            @foreach ($data_obat as $row)
+                                                <option value="{{ $row->id.'-'.$row->nama_obat }}">{{ $row->kode_obat }} - {{ $row->nama_obat }}</option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label>{{ __('Jumlah Pesan') }} <span class="text-danger">*</span></label>
+                                    <input type="number" name="jumlah_out[]" class="form-control" required>
+                                </div>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -117,14 +125,6 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>{{ __('Kode Obat') }}</label>
-                        <p id="detail-kode-obat" class="form-control"></p>
-                    </div>
-                    <div class="form-group">
-                        <label>{{ __('Nama Obat') }}</label>
-                        <p id="detail-nama-obat" class="form-control"></p>
-                    </div>
-                    <div class="form-group">
                         <label>{{ __('Nama Perusahaan') }}</label>
                         <p id="detail-nama-perusahaan" class="form-control"></p>
                     </div>
@@ -133,8 +133,8 @@
                         <p id="detail-tanggal-pesanan" class="form-control"></p>
                     </div>
                     <div class="form-group">
-                        <label>{{ __('Jumlah Pesan') }}</label>
-                        <p id="detail-jumlah-out" class="form-control"></p>
+                        <label>{{ __('Obat') }}</label>
+                        <div id="detail-obat"></div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -165,6 +165,48 @@
                 //minDate: new Date() // Now can select only dates, which goes after today
             })
 
+            var rowCounter = 1;
+
+            $('#add-button').on('click', function () {
+                var html = `
+                <div class="form-group row" id="obat-row-${rowCounter}">
+                    <div class="col-md-6">
+                        <label>{{ __('Obat') }} <span class="text-danger">*</span></label>
+                        <select class="form-control select2 obat" name="obat_id[]" required>
+                            @if ($data_obat)
+                @foreach ($data_obat as $row)
+                <option value="{{ $row->id.'-'.$row->nama_obat }}">{{ $row->kode_obat }} - {{ $row->nama_obat }}</option>
+                @endforeach
+                @endif
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label>{{ __('Jumlah Pesan') }} <span class="text-danger">*</span></label>
+                        <input type="number" name="jumlah_out[]" class="form-control" required>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-danger btn-xs remove-row" data-row="${rowCounter}"><i class="icon-minus"></i></button>
+                    </div>
+                </div>
+                `;
+
+                $('#tambah-input').append(html);
+                $('.select2').select2();
+                rowCounter++;
+            });
+
+            $(document).on('click', '.remove-row', function () {
+                var row = $(this).data('row');
+                $('#obat-row-' + row).remove();
+            });
+
+            $('#remove-button').on('click', function () {
+                var rowCount = $('#tambah-input').children().length;
+                if (rowCount > 1) {
+                    $('#tambah-input').children().last().remove();
+                }
+            });
+
             var datatable = $('#datatable').DataTable({
                 processing: true,
                 serverSide: true,
@@ -174,8 +216,24 @@
                     { data: 'action', name: 'action', orderable: false, searchable: false },
                     { data: 'nama_perusahaan', name: 'nama_perusahaan' },
                     { data: 'tanggal_pesanan', name: 'tanggal_pesanan' },
-                    { data: 'data_obat.nama_obat', name: 'data_obat.nama_obat' },
-                    { data: 'jumlah_out', name: 'jumlah_out' },
+                    {
+                        data: 'obat',
+                        name: 'obat',
+                        render: function(data) {
+                            var parsedData = data.replace(/&quot;/g, '"');
+                            var obatData = JSON.parse(parsedData);
+                            var obatText = '';
+                            for (var i = 0; i < obatData.length; i++) {
+                                var namaObat = obatData[i].nama_obat;
+                                var jumlahOut = obatData[i].jumlah_out;
+                                obatText += namaObat + ' (' + jumlahOut + ')';
+                                if (i < obatData.length - 1) {
+                                    obatText += ', ';
+                                }
+                            }
+                            return obatText;
+                        }
+                    },
                     { data: 'last_modified', name: 'last_modified' }
                 ]
             });
@@ -229,11 +287,24 @@
 
                 $.get(url, function(response) {
                     let data = response.data
-                    $('#detail-kode-obat').html(data.data_obat.kode_obat)
-                    $('#detail-nama-obat').html(data.data_obat.nama_obat)
                     $('#detail-tanggal-pesanan').html(data.tanggal_pesanan)
-                    $('#detail-jumlah-out').html(data.jumlah_out)
                     $('#detail-nama-perusahaan').html(data.nama_perusahaan)
+
+                    var obatData = JSON.parse(data.obat);
+                    var obatTable = '<table class="table table-bordered">';
+                    obatTable += '<thead><tr><th>Nama Obat</th><th>Jumlah Pesan</th></tr></thead>';
+                    obatTable += '<tbody>';
+
+                    for (var i = 0; i < obatData.length; i++) {
+                        var namaObat = obatData[i].nama_obat;
+                        var jumlahOut = obatData[i].jumlah_out;
+
+                        obatTable += '<tr><td>' + namaObat + '</td><td>' + jumlahOut + '</td></tr>';
+                    }
+
+                    obatTable += '</tbody></table>';
+
+                    $('#detail-obat').html(obatTable);
 
                     $('#detail-modal').modal('show')
                 }).fail((err) => {
@@ -347,6 +418,15 @@
                 })
 
             })
+
+            $(document).on('click', '.print-btn', function() {
+                let id = $(this).data('id');
+                let url = '{{ route('surat-pesanan-pdf', ':id') }}';
+                url = url.replace(':id', id);
+
+                window.open(url, '_blank');
+            });
+
         });
     </script>
 
