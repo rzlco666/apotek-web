@@ -8,6 +8,7 @@ use App\Http\Controllers\Obat\KategoriObatController;
 use App\Http\Controllers\Obat\OutObatController;
 use App\Http\Controllers\Obat\StokObatController;
 use App\Http\Controllers\Pesanan\SuratPesananController;
+use App\Http\Controllers\Setting\ProfileController;
 use App\Http\Controllers\Supplier\SupplierController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -109,4 +110,11 @@ Route::prefix('pesanan')->middleware(['auth'])->group(function () {
     Route::post('surat-pesanan/{id}', [SuratPesananController::class, 'update'])->name('surat-pesanan-update');
     Route::delete('surat-pesanan/{id}', [SuratPesananController::class, 'destroy'])->name('surat-pesanan-delete');
     Route::get('surat-pesanan/pdf/{id}', [SuratPesananController::class, 'pdf'])->name('surat-pesanan-pdf');
+});
+
+Route::prefix('setting')->middleware(['auth'])->group(function () {
+    //profile
+    Route::get('/profile', [ProfileController::class, 'index'])->name('user-profile');
+    Route::post('/update-profile', [ProfileController::class, 'update'])->name('update-profile');
+    Route::post('/change-password', [ProfileController::class, 'changePassword'])->name('change-password');
 });
