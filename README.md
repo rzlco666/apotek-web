@@ -9,6 +9,7 @@
     * php artisan key:generate
     * php artisan migrate:fresh
     * php artisan migrate:fresh --seed
+    * php artisan db:seed --class=PermissionSeeder
     * php artisan migrate
     * php artisan serve
     * npm run dev
