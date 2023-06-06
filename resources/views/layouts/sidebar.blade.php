@@ -35,9 +35,9 @@
               <li class="sidebar-list">
                   <i class="fa fa-thumb-tack"></i><a class="sidebar-link sidebar-title" href="javascript:void(0)"><i data-feather="layout"></i><span>Referensi</span></a>
                   <ul class="sidebar-submenu">
-                      <li><a href="#">User</a></li>
-                      <li><a href="#">Role</a></li>
-                      <li><a href="#">Permission</a></li>
+                      <li><a href="{{ route('user') }}">User</a></li>
+                      <li><a href="{{ route('role') }}">Role</a></li>
+                      <li><a href="{{ route('permission') }}">Permission</a></li>
                   </ul>
               </li>
           </ul>

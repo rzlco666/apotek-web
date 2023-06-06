@@ -9,6 +9,9 @@ use App\Http\Controllers\Obat\OutObatController;
 use App\Http\Controllers\Obat\StokObatController;
 use App\Http\Controllers\Pesanan\SuratPesananController;
 use App\Http\Controllers\Setting\ProfileController;
+use App\Http\Controllers\Setting\RoleController;
+use App\Http\Controllers\Setting\PermissionController;
+use App\Http\Controllers\Setting\UserController;
 use App\Http\Controllers\Supplier\SupplierController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -115,6 +118,30 @@ Route::prefix('pesanan')->middleware(['auth'])->group(function () {
 Route::prefix('setting')->middleware(['auth'])->group(function () {
     //profile
     Route::get('/profile', [ProfileController::class, 'index'])->name('user-profile');
-    Route::post('/update-profile', [ProfileController::class, 'update'])->name('update-profile');
+    Route::post('/update-profile', [ProfileController::class, 'updateProfile'])->name('update-profile');
     Route::post('/change-password', [ProfileController::class, 'changePassword'])->name('change-password');
+
+    //role
+    Route::get('role', [RoleController::class, 'index'])->name('role');
+    Route::get('role/datatable', [RoleController::class, 'datatable'])->name('role-datatable');
+    Route::post('role', [RoleController::class, 'store'])->name('role-create');
+    Route::get('role/{id}', [RoleController::class, 'show'])->name('role-detail');
+    Route::post('role/{id}', [RoleController::class, 'update'])->name('role-update');
+    Route::delete('role/{id}', [RoleController::class, 'destroy'])->name('role-delete');
+
+    //Permission
+    Route::get('permission', [PermissionController::class, 'index'])->name('permission');
+    Route::get('permission/datatable', [PermissionController::class, 'datatable'])->name('permission-datatable');
+    Route::post('permission', [PermissionController::class, 'store'])->name('permission-create');
+    Route::get('permission/{id}', [PermissionController::class, 'show'])->name('permission-detail');
+    Route::post('permission/{id}', [PermissionController::class, 'update'])->name('permission-update');
+    Route::delete('permission/{id}', [PermissionController::class, 'destroy'])->name('permission-delete');
+
+     //User
+     Route::get('user', [UserController::class, 'index'])->name('user');
+     Route::get('user/datatable', [UserController::class, 'datatable'])->name('user-datatable');
+     Route::post('user', [UserController::class, 'store'])->name('user-create');
+     Route::get('user/{id}', [UserController::class, 'show'])->name('user-detail');
+     Route::post('user/{id}', [UserController::class, 'update'])->name('user-update');
+     Route::delete('user/{id}', [UserController::class, 'destroy'])->name('user-delete');
 });

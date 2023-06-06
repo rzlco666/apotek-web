@@ -46,85 +46,37 @@
                         </div>
                         <div class="card-body">
                             <div class="row">
+                                <input type="hidden" name="user" id="user-id" value="{{ Auth::user()->id }}">
                                 <div class="col-md-12">
                                     <div class="mb-3">
                                         <label class="form-label f-w-500">Name</label>
-                                        <p class="form-control">{{ Auth::user()->name }}</p>
+                                        {{-- <p class="form-control">{{ Auth::user()->name }}</p> --}}
+                                        <input type="text" name="name" id="name" class="form-control" value="{{ Auth::user()->name }}">
                                     </div>
                                 </div>
                                 <div class="col-md-12">
                                     <div class="mb-3">
                                         <label class="form-label f-w-500">Email</label>
-                                        <p class="form-control">{{ Auth::user()->email }}</p>
+                                        {{-- <p class="form-control">{{ Auth::user()->email }}</p> --}}
+                                        <input type="email" name="email" id="email" class="form-control" value="{{ Auth::user()->email }}">
                                     </div>
                                 </div>
                                 <div class="col-md-12">
                                     <div class="mb-3">
                                         <label class="form-label f-w-500">Date Join</label>
-                                        <p class="form-control">{{ Auth::user()->created_at }}</p>
+                                        {{-- <p class="form-control">{{ Auth::user()->created_at }}</p> --}}
+                                        <input type="text" name="created_at" id="created_at" class="form-control" value="{{ Auth::user()->created_at }}" readonly>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="card-footer text-end">
-                            <button class="btn btn-primary" type="submit">Update Profile</button>
+                            <button class="btn btn-primary" id="save-btn" type="button">Update Profile</button>
                             <button class="btn btn-secondary" type="button" data-bs-toggle="modal" data-bs-target="#password-modal" id="change-password-btn">
                                 {{ __('Change Password') }}
                             </button>
                         </div>
                     </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    {{-- modal Add Data --}}
-    <div class="modal fade" id="form-modal" role="dialog" aria-labelledby="modal-form-label" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modal-form-label">Add {{ __('Data') }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="form-input">
-                        <input type="hidden" name="obat_id" id="obat-id">
-                        <div class="form-group">
-                            <label>{{ __('Kode Obat') }} <span class="text-danger">*</span></label>
-                            <input type="text" name="kode_obat" id="kode-obat" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label>{{ __('Nama Obat') }} <span class="text-danger">*</span></label>
-                            <input type="text" name="nama_obat" id="nama-obat" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label>{{ __('Dosis') }} <span class="text-danger">*</span></label>
-                            <input type="text" name="dosis" id="dosis" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label>{{ __('Kategori Obat') }} <span class="text-danger">*</span></label>
-                            <select class="form-control select2" name="kategori_obat_id" id="kategori-obat-id" required>
-                                {{--@if ($category_obat)
-                                    @foreach ($category_obat as $row)
-                                        <option value="{{ $row->id }}">{{ $row->nama_kategori }}</option>
-                                    @endforeach
-                                @endif--}}
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>{{ __('Satuan') }} <span class="text-danger">*</span></label>
-                            <input type="text" name="satuan" id="satuan" class="form-control" required>
-                        </div>
-                        <div class="form-group">
-                            <label>{{ __('Golongan') }} <span class="text-danger">*</span></label>
-                            <input type="text" name="golongan" id="golongan" class="form-control" required>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" id="save-btn" class="btn btn-sm btn-primary">Submit</button>
                 </div>
             </div>
         </div>
@@ -187,7 +139,54 @@
     <script src="{{ asset('assets/js/select2/select2.full.min.js') }}"></script>
 
     <script type="text/javascript">
+
         $(document).ready(function () {
+            $('#save-btn').on('click', function() {
+                // Mendapatkan nilai input dari form
+                var id = document.getElementById('user-id').value;
+                var name = document.getElementById('name').value;
+                var email = document.getElementById('email').value;
+
+                // Membuat objek data yang akan dikirim
+                var data = new FormData();
+                data.append('id', id);
+                data.append('name', name);
+                data.append('email', email);
+
+                // Mengirim data ke rute update-profile menggunakan AJAX
+                fetch('{{ route('update-profile') }}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: data
+                })
+                .then(response => response.json())
+                .then(result => {
+                // Menghandle respons dari server
+                if (result.status) {
+                    // Jika update berhasil
+                    Swal.fire({
+                    title: 'Success',
+                    text: result.message,
+                    icon: 'success',
+                    confirmButtonText: 'Ok'
+                    });
+                } else {
+                    // Jika update gagal
+                    Swal.fire({
+                    title: 'Error',
+                    text: result.message,
+                    icon: 'error',
+                    confirmButtonText: 'Ok'
+                    });
+                }
+                })
+                .catch(error => {
+                console.error('Error:', error);
+                })
+            })
+
             $('#new-password-visibility').on('click', function() {
                 let type = $('#new-password').attr('type')
                 if (type == 'text') {

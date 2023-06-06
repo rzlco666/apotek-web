@@ -89,4 +89,54 @@ class ProfileController extends Controller
         return response()->json($result, $result['code']);
     }
 
+
+    public function updateProfile(Request $request)
+    {
+        $id = $request->id;
+        $validated = $request->validate([
+            'name' => 'required|string|unique:users,name,'.$id.',id',
+            'email' => 'required|email|max:200|unique:users,email,'.$id.',id',
+        ]);
+
+        if (!$validated) {
+            $result = [
+                'code' => 400,
+                'status' => false,
+                'message' => $errors->all()
+            ];
+
+            return response()->json($result, $result['code']);
+        }
+
+        $user = User::where('id', $id)->first();
+
+        if (!$user) {
+            $result = [
+                'code' => 404,
+                'status' => false,
+                'message' => 'Data not found'
+            ];
+            return response()->json($result, $result['code']);
+        }
+
+        $user->name = $request->name;
+        $user->email = $request->email;
+
+        if ($user->save()) {
+            $result = [
+                'code' => 200,
+                'status' => true,
+                'message' => 'Save data success'
+            ];
+        } else {
+            $result = [
+                'code' => 400,
+                'status' => false,
+                'message' => 'Save data failed'
+            ];
+        }
+
+        return response()->json($result, $result['code']);
+    }
+
 }
