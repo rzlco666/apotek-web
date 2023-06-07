@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Setting;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting\Role;
+use App\Models\Setting\RoleHasPermission;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -68,6 +69,7 @@ class RoleController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|unique:roles,name,NULL,id',
+            'permissions' => 'required|string',
         ]);
 
         if (!$validated) {
@@ -87,7 +89,16 @@ class RoleController extends Controller
 
         $role = Role::create($params);
 
+
         if ($role) {
+            // Save role-permission relationships
+            $permissions = explode(',', $request->permissions);
+            foreach ($permissions as $permissionId) {
+                RoleHasPermission::create([
+                    'role_id' => $role->id,
+                    'permission_id' => $permissionId
+                ]);
+            }
             $result = [
                 'code' => 200,
                 'status' => true,
@@ -112,7 +123,7 @@ class RoleController extends Controller
      */
     public function show($id)
     {
-        $data = Role::where('id', $id)->first();
+        $data = Role::with('userPermission')->where('id', $id)->first();
 
         if ($data) {
             $result = [
@@ -143,6 +154,7 @@ class RoleController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|unique:roles,name,'.$id.',id',
+            'permissions' => 'nullable|string'
         ]);
 
         if (!$validated) {
@@ -170,6 +182,21 @@ class RoleController extends Controller
         $role->guard_name = 'web';
 
         if ($role->save()) {
+            // Update role-permission relationships
+            $permissions = $request->input('permissions', '');
+            $permissions = explode(',', $permissions);
+
+            // Delete existing role-permission relationships
+            RoleHasPermission::where('role_id', $role->id)->delete();
+
+            // Save new role-permission relationships
+            foreach ($permissions as $permissionId) {
+                RoleHasPermission::create([
+                    'role_id' => $role->id,
+                    'permission_id' => $permissionId
+                ]);
+            }
+
             $result = [
                 'code' => 200,
                 'status' => true,
@@ -195,6 +222,7 @@ class RoleController extends Controller
     public function destroy($id)
     {
         $role = Role::where('id', $id)->first();
+        RoleHasPermission::where('role_id', $id)->delete();
 
         if (!$role) {
             $result = [

@@ -220,4 +220,25 @@ class PermissionController extends Controller
         }
         return response()->json($result, $result['code']);
     }
+
+    public function allPermission()
+    {
+        $data = Permission::select('id', 'name', 'guard_name')->get();
+        if ($data) {
+            $result = [
+                'code' => 200,
+                'status' => true,
+                'message' => 'Get data success',
+                'data' => $data
+            ];
+        } else {
+            $result = [
+                'code' => 404,
+                'status' => false,
+                'message' => 'Data not found'
+            ];
+        }
+
+        return response()->json($result, $result['code']);
+    }
 }

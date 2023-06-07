@@ -2,6 +2,12 @@
 
 @section('css')
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/datatables.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        ul.list-unstyled li {
+            list-style-type: disc;
+            }
+    </style>
 @endsection
 
 @section('title')
@@ -77,6 +83,12 @@
                             <label>{{ __('Nama Role') }} <span class="text-danger">*</span></label>
                             <input type="text" name="name" id="nama-kategori" class="form-control" required>
                         </div>
+                        <div class="form-group">
+                            <label>{{ __('Permission') }} <span class="text-danger">*</span></label>
+                            <select name="permissions[]" id="permissions" class="form-control" multiple required>
+                              <!-- Options will be added dynamically using JavaScript -->
+                            </select>
+                          </div>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -102,6 +114,10 @@
                         <label>{{ __('Nama Role') }}</label>
                         <p id="detail-role" class="form-control"></p>
                     </div>
+                    <div class="form-group">
+                        <label>Permissions</label>
+                        <ul id="detail-permissions" class="list-unstyled mr-2" style="margin-left: 19px"></ul>
+                      </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -116,9 +132,29 @@
     <script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/js/datatable/datatables/datatable.custom.js') }}"></script>
     <script src="{{ asset('assets/js/tooltip-init.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script type="text/javascript">
         $(document).ready(function () {
+            // Fetch permissions data
+            $.ajax({
+                url: '{{ route('permission-all') }}',
+                method: 'GET',
+                success: function(response) {
+                let permissions = response.data;
+
+                // Populate select options
+                permissions.forEach(function(permission) {
+                    $('#permissions').append('<option value="' + permission.id + '">' + permission.name + '</option>');
+                });
+
+                // Initialize select2 plugin
+                $('#permissions').select2();
+                },
+                error: function(err) {
+                console.error('Failed to fetch permissions data:', err);
+                }
+            });
             var datatable = $('#datatable').DataTable({
                 processing: true,
                 serverSide: true,
@@ -140,104 +176,147 @@
                 $('#role-id').val('')
                 $('#modal-form-label').text('Add Role')
                 $('#nama-kategori').val('')
+                $('#permissions').val(null).trigger('change'); // Reset select2 value
 
                 $('.modal-backdrop').remove();
                 $('body').removeClass('modal-open');
             })
 
             $(document).on('click', '.edit-btn', function() {
-                let id = $(this).data('id')
-                let url = '{{ route('role-detail', ':id') }}'
-                url = url.replace(':id', id)
-                $('#role-id').val(id)
-                $('#modal-form-label').text('Edit {{ __('Role') }}')
+            let id = $(this).data('id');
+            let url = '{{ route('role-detail', ':id') }}';
+            url = url.replace(':id', id);
+            $('#role-id').val(id);
+            $('#modal-form-label').text('Edit {{ __('Role') }}');
 
-                $.get(url, function(response) {
-                    let data = response.data
-                    $('#nama-kategori').val(data.name)
+            $.get(url, function(response) {
+                let data = response.data;
+                $('#nama-kategori').val(data.name);
 
-                    $('#form-modal').modal('show')
-                }).fail((err) => {
-                    Swal.fire({
-                        title: 'Error',
-                        text: err.responseJSON.message,
-                        icon: 'error',
-                        confirmButtonText: 'Ok'
-                    })
-                })
+                // Fetch permissions data
+                $.ajax({
+                url: '{{ route('permission-all') }}',
+                method: 'GET',
+                success: function(response) {
+                    let permissions = response.data;
 
-            })
+                    // Clear existing options
+                    $('#permissions').empty();
+
+                    // Populate select options
+                    permissions.forEach(function(permission) {
+                    let selected = '';
+                    // Check if permission is selected for the role
+                    if (data.user_permission.find(p => p.permission_id === permission.id)) {
+                        selected = 'selected';
+                    }
+                    $('#permissions').append('<option value="' + permission.id + '" ' + selected + '>' + permission.name + '</option>');
+                    });
+
+                    // Initialize select2 plugin
+                    $('#permissions').select2();
+                },
+                error: function(err) {
+                    console.error('Failed to fetch permissions data:', err);
+                }
+                });
+
+                $('#form-modal').modal('show');
+            }).fail((err) => {
+                Swal.fire({
+                title: 'Error',
+                text: err.responseJSON.message,
+                icon: 'error',
+                confirmButtonText: 'Ok'
+                });
+            });
+            });
 
             $(document).on('click', '.detail-btn', function() {
-                let id = $(this).data('id')
-                let url = '{{ route('role-detail', ':id') }}'
-                url = url.replace(':id', id)
+                let id = $(this).data('id');
+                let url = '{{ route('role-detail', ':id') }}';
+                url = url.replace(':id', id);
 
                 $.get(url, function(response) {
-                    let data = response.data
-                    $('#detail-role').html(data.name)
+                    let data = response.data;
+                    $('#detail-role').html(data.name);
 
-                    $('#detail-modal').modal('show')
+                    let permissions = data.user_permission;
+                    console.log(permissions);
+
+                    let permissionList = '';
+
+                    permissions.forEach(function(permission) {
+                    permissionList += '<li>' + permission.permission_name  + '</li>';
+                    });
+
+                    $('#detail-permissions').html(permissionList);
+
+                    $('#detail-modal').modal('show');
                 }).fail((err) => {
                     Swal.fire({
-                        title: 'Error',
-                        text: err.responseJSON.message,
-                        icon: 'error',
-                        confirmButtonText: 'Ok'
-                    })
-                })
+                    title: 'Error',
+                    text: err.responseJSON.message,
+                    icon: 'error',
+                    confirmButtonText: 'Ok'
+                    });
+                });
+                });
 
-            })
 
+            // Handle save button click
             $('#save-btn').on('click', function() {
-                let params = new FormData($('#form-input')[0])
-                let url = '{{ route('role-create') }}'
-                let kategori_obat_id = $('#role-id').val()
+                let params = new FormData($('#form-input')[0]);
+                let url = '{{ route('role-create') }}';
+                let kategori_obat_id = $('#role-id').val();
 
                 if (kategori_obat_id !== '') {
-                    url = '{{ route('role-update', ':id') }}'
-                    url = url.replace(':id', kategori_obat_id)
+                url = '{{ route('role-update', ':id') }}';
+                url = url.replace(':id', kategori_obat_id);
                 }
 
+                params.append('permissions', $('#permissions').val());
+
                 $.ajax({
-                    url: url,
-                    data: params,
-                    cache: false,
-                    contentType: false,
-                    processData: false,
-                    method: 'POST',
-                    success: function(response) {
-                        Swal.fire({
-                            title: 'Success',
-                            text: response.message,
-                            icon: 'success',
-                            confirmButtonText: 'Ok'
-                        })
-                        datatable.ajax.reload(null, false)
+                url: url,
+                data: params,
+                cache: false,
+                contentType: false,
+                processData: false,
+                method: 'POST',
+                success: function(response) {
+                    Swal.fire({
+                    title: 'Success',
+                    text: response.message,
+                    icon: 'success',
+                    confirmButtonText: 'Ok'
+                    });
 
-                        $('#form-modal').modal('hide')
-                        $('.modal-backdrop').remove()
-                        $('body').removeClass('modal-open')
-                        $('body').removeAttr('style')
+                    datatable.ajax.reload(null, false);
 
-                        // Reset modal state after hiding
-                        setTimeout(function(){
-                            $('#form-modal').removeClass('show');
-                            $('.modal-backdrop').remove();
-                            $('body').removeClass('modal-open');
-                            $('body').css('padding-right', '');
-                        }, 500);
-                    },
-                    error: function(err) {
-                        Swal.fire({
-                            title: 'Error',
-                            text: err.responseJSON.message,
-                            icon: 'error',
-                            confirmButtonText: 'Ok'
-                        })
-                    }
+                    $('#form-modal').modal('hide');
+                    $('.modal-backdrop').remove();
+                    $('body').removeClass('modal-open');
+                    $('body').removeAttr('style');
+
+                    // Reset modal state after hiding
+                    setTimeout(function() {
+                    $('#form-modal').removeClass('show');
+                    $('.modal-backdrop').remove();
+                    $('body').removeClass('modal-open');
+                    $('body').css('padding-right', '');
+                    }, 500);
+                },
+                error: function(err) {
+                    Swal.fire({
+                    title: 'Error',
+                    text: err.responseJSON.message,
+                    icon: 'error',
+                    confirmButtonText: 'Ok'
+                    });
+                }
                 });
-            })
+            });
 
             $(document).on('click', '.delete-btn', function() {
                 let id = $(this).data('id')

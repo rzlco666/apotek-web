@@ -25,4 +25,9 @@ class Role extends SpatieRole
             return Carbon::parse($this->updated_at)->format('d M Y H:i');
         }
     }
+
+    public function userPermission()
+    {
+        return $this->hasMany(RoleHasPermission::class, 'role_id', 'id');
+    }
 }

@@ -136,6 +136,7 @@ Route::prefix('setting')->middleware(['auth'])->group(function () {
     Route::get('permission/{id}', [PermissionController::class, 'show'])->name('permission-detail');
     Route::post('permission/{id}', [PermissionController::class, 'update'])->name('permission-update');
     Route::delete('permission/{id}', [PermissionController::class, 'destroy'])->name('permission-delete');
+    Route::get('permission/all/data', [PermissionController::class, 'allPermission'])->name('permission-all');
 
      //User
      Route::get('user', [UserController::class, 'index'])->name('user');
