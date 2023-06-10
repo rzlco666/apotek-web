@@ -73,7 +73,8 @@ class DataFakturController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'obat_id' => 'required',
+            'obat_id.*' => 'required',
+            'jumlah.*' => 'required',
             'tanggal_faktur' => 'required',
             'total_obat' => 'required',
             'total_bayar' => 'required',
@@ -93,7 +94,6 @@ class DataFakturController extends Controller
         $total_bayar = str_replace(['Rp. ', '.'], '', $request->total_bayar);
 
         $params = [
-            'obat_id' => $request->obat_id,
             'tanggal_faktur' => $request->tanggal_faktur,
             'total_obat' => $request->total_obat,
             'total_bayar' => $total_bayar,
@@ -104,6 +104,18 @@ class DataFakturController extends Controller
         $ref_kategori = DataFaktur::create($params);
 
         if ($ref_kategori) {
+            $obatData = [];
+            foreach ($request->obat_id as $index => $obatId) {
+                $obatArr = explode('-', $obatId);
+                $obatData[] = [
+                    'obat_id' => $obatArr[0],
+                    'nama_obat' => $obatArr[1],
+                    'jumlah' => $request->jumlah[$index]
+                ];
+            }
+            $ref_kategori->obat = $obatData;
+            $ref_kategori->save();
+
             $result = [
                 'code' => 200,
                 'status' => true,
@@ -158,7 +170,8 @@ class DataFakturController extends Controller
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'obat_id' => 'required',
+            'obat_id.*' => 'required',
+            'jumlah.*' => 'required',
             'tanggal_faktur' => 'required',
             'total_obat' => 'required',
             'total_bayar' => 'required',
@@ -188,14 +201,25 @@ class DataFakturController extends Controller
 
         $total_bayar = str_replace(['Rp. ', '.'], '', $request->total_bayar);
 
-        $ref_kategori->obat_id = $request->obat_id;
         $ref_kategori->tanggal_faktur = $request->tanggal_faktur;
         $ref_kategori->total_obat = $request->total_obat;
         $ref_kategori->total_bayar = $total_bayar;
         $ref_kategori->supplier_id = $request->supplier_id;
         $ref_kategori->updated_by = Auth::user()->id;
 
-        if ($ref_kategori->save()) {
+        if ($ref_kategori) {
+            $obatData = [];
+            foreach ($request->obat_id as $index => $obatId) {
+                $obatArr = explode('-', $obatId);
+                $obatData[] = [
+                    'obat_id' => $obatArr[0],
+                    'nama_obat' => $obatArr[1],
+                    'jumlah' => $request->jumlah[$index]
+                ];
+            }
+            $ref_kategori->obat = $obatData;
+            $ref_kategori->save();
+
             $result = [
                 'code' => 200,
                 'status' => true,

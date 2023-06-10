@@ -79,14 +79,27 @@
                             <input type="text" name="tanggal_faktur" id="tanggal-faktur" data-date-format="yyyy-mm-dd" class="form-control digits" required>
                         </div>
                         <div class="form-group">
-                            <label>{{ __('Obat') }} <span class="text-danger">*</span></label>
-                            <select class="form-control select2" name="obat_id" id="obat-id" required>
-                                @if ($data_obat)
-                                    @foreach ($data_obat as $row)
-                                        <option value="{{ $row->id }}">{{ $row->kode_obat }} - {{ $row->nama_obat }}</option>
-                                    @endforeach
-                                @endif
-                            </select>
+                            <button type="button" value="tambah" id="add-button" class="btn btn-primary btn-xs">
+                                <i class="icon-plus"></i>
+                            </button>
+                        </div>
+                        <div id="tambah-input">
+                            <div class="form-group row" id="obat-row-0">
+                                <div class="col-md-6">
+                                    <label>{{ __('Obat') }} <span class="text-danger">*</span></label>
+                                    <select class="form-control select2 obat" name="obat_id[]" required>
+                                        @if ($data_obat)
+                                            @foreach ($data_obat as $row)
+                                                <option value="{{ $row->id.'-'.$row->nama_obat }}">{{ $row->kode_obat }} - {{ $row->nama_obat }}</option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label>{{ __('Jumlah') }} <span class="text-danger">*</span></label>
+                                    <input type="number" name="jumlah[]" class="form-control" required>
+                                </div>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label>{{ __('Total Obat') }} <span class="text-danger">*</span></label>
@@ -128,14 +141,6 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>{{ __('Kode Obat') }}</label>
-                        <p id="detail-kode-obat" class="form-control"></p>
-                    </div>
-                    <div class="form-group">
-                        <label>{{ __('Nama Obat') }}</label>
-                        <p id="detail-nama-obat" class="form-control"></p>
-                    </div>
-                    <div class="form-group">
                         <label>{{ __('Tanggal Faktur') }}</label>
                         <p id="detail-tanggal-faktur" class="form-control"></p>
                     </div>
@@ -150,6 +155,10 @@
                     <div class="form-group">
                         <label>{{ __('Supplier') }}</label>
                         <p id="detail-supplier-id" class="form-control"></p>
+                    </div>
+                    <div class="form-group">
+                        <label>{{ __('Obat') }}</label>
+                        <div id="detail-obat"></div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -183,6 +192,48 @@
 
             $('#total-bayar').maskMoney({prefix:'Rp. ', thousands:'.', decimal:',', precision:0});
 
+            var rowCounter = 1;
+
+            $('#add-button').on('click', function () {
+                var html = `
+                <div class="form-group row" id="obat-row-${rowCounter}">
+                    <div class="col-md-6">
+                        <label>{{ __('Obat') }} <span class="text-danger">*</span></label>
+                        <select class="form-control select2 obat" name="obat_id[]" required>
+                            @if ($data_obat)
+                @foreach ($data_obat as $row)
+                <option value="{{ $row->id.'-'.$row->nama_obat }}">{{ $row->kode_obat }} - {{ $row->nama_obat }}</option>
+                @endforeach
+                @endif
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label>{{ __('Jumlah') }} <span class="text-danger">*</span></label>
+                        <input type="number" name="jumlah[]" class="form-control" required>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-danger btn-xs remove-row" data-row="${rowCounter}"><i class="icon-minus"></i></button>
+                    </div>
+                </div>
+                `;
+
+                $('#tambah-input').append(html);
+                $('.select2').select2();
+                rowCounter++;
+            });
+
+            $(document).on('click', '.remove-row', function () {
+                var row = $(this).data('row');
+                $('#obat-row-' + row).remove();
+            });
+
+            $('#remove-button').on('click', function () {
+                var rowCount = $('#tambah-input').children().length;
+                if (rowCount > 1) {
+                    $('#tambah-input').children().last().remove();
+                }
+            });
+
             var datatable = $('#datatable').DataTable({
                 processing: true,
                 serverSide: true,
@@ -190,7 +241,24 @@
                 columns: [
                     { data: 'DT_RowIndex', name: 'DT_RowIndex' },
                     { data: 'action', name: 'action', orderable: false, searchable: false },
-                    { data: 'data_obat.nama_obat', name: 'data_obat.nama_obat' },
+                    {
+                        data: 'obat',
+                        name: 'obat',
+                        render: function(data) {
+                            var parsedData = data.replace(/&quot;/g, '"');
+                            var obatData = JSON.parse(parsedData);
+                            var obatText = '';
+                            for (var i = 0; i < obatData.length; i++) {
+                                var namaObat = obatData[i].nama_obat;
+                                var jumlahOut = obatData[i].jumlah;
+                                obatText += namaObat + ' (' + jumlahOut + ')';
+                                if (i < obatData.length - 1) {
+                                    obatText += ', ';
+                                }
+                            }
+                            return obatText;
+                        }
+                    },
                     { data: 'tanggal_faktur', name: 'tanggal_faktur' },
                     { data: 'total_obat', name: 'total_obat' },
                     {
@@ -256,12 +324,26 @@
 
                 $.get(url, function(response) {
                     let data = response.data
-                    $('#detail-kode-obat').html(data.data_obat.kode_obat)
-                    $('#detail-nama-obat').html(data.data_obat.nama_obat)
                     $('#detail-tanggal-faktur').html(data.tanggal_faktur)
                     $('#detail-total-obat').html(data.total_obat)
                     $('#detail-total-bayar').html(new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(data.total_bayar))
                     $('#detail-supplier-id').html(data.data_supplier.nama_perusahaan)
+
+                    var obatData = JSON.parse(data.obat);
+                    var obatTable = '<table class="table table-bordered">';
+                    obatTable += '<thead><tr><th>Nama Obat</th><th>Jumlah</th></tr></thead>';
+                    obatTable += '<tbody>';
+
+                    for (var i = 0; i < obatData.length; i++) {
+                        var namaObat = obatData[i].nama_obat;
+                        var jumlahOut = obatData[i].jumlah;
+
+                        obatTable += '<tr><td>' + namaObat + '</td><td>' + jumlahOut + '</td></tr>';
+                    }
+
+                    obatTable += '</tbody></table>';
+
+                    $('#detail-obat').html(obatTable);
 
                     $('#detail-modal').modal('show')
                 }).fail((err) => {
