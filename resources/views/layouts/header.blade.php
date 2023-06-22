@@ -44,6 +44,13 @@
           <li>
             <div class="mode"><i class="fa fa-moon-o"></i></div>
           </li>
+            <li class="onhover-dropdown">
+                <div class="notification-box"><i data-feather="bell"></i></div>
+                <ul class="notification-dropdown onhover-show-div">
+                    <div id="notifications-dropdown">
+                    </div>
+                </ul>
+            </li>
           <li class="maximize"><a href="#!" onclick="javascript:toggleFullScreen()"><i
                 data-feather="maximize-2"></i></a></li>
           <li class="profile-nav onhover-dropdown">
@@ -77,3 +84,55 @@
         type="text/x-handlebars-template"><div class="EmptyMessage">Your search turned up 0 results. This most likely means the backend is down, yikes!</div></script>
     </div>
   </div>
+<!-- latest jquery-->
+<script src="{{ asset('assets/js/jquery-3.6.0.min.js') }}"></script>
+<script>
+    function getPesanNotif() {
+        $.ajax({
+            type: 'GET',
+            url: "{{ route('notification') }}",
+            dataType: 'json',
+            success: function(data) {
+                let notifications = data ?? [];
+                let html = `<li><i data-feather="bell"></i><h6 class="f-18 mb-0">Notitications</h6></li>`;
+
+                if (notifications.length > 0) {
+                    notifications.forEach(notification => {
+                        html += `
+                                    <li>
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-grow-1">
+                                                <p style="text-align: left !important;">
+                                                <a href="{{ route('exp-obat') }}">${notification.data_obat.nama_obat} (${notification.data_obat.kode_obat}) </a>
+                                                <br>
+                                                <span class="text-danger">Kadaluwarsa : ${notification.tanggal_kadaluwarsa}</span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </li>
+                                `;
+                    });
+                } else {
+                    html = `<li><i data-feather="bell"></i><h6 class="f-18 mb-0">Notitications</h6></li>
+                                    <li>
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-grow-1">
+                                                <p>Tidak Ada Notifikasi</p>
+                                            </div>
+                                        </div>
+                                    </li>`;
+                }
+
+                $('#notifications-dropdown').html(html);
+            },
+            error: function(error) {
+                console.error(error);
+            }
+        });
+    }
+
+    jQuery(document).ready(function() {
+        getPesanNotif();
+    });
+
+</script>

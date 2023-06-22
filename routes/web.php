@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Faktur\DataFakturController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Obat\DataObatController;
 use App\Http\Controllers\Obat\ExpObatController;
 use App\Http\Controllers\Obat\InObatController;
@@ -8,9 +9,9 @@ use App\Http\Controllers\Obat\KategoriObatController;
 use App\Http\Controllers\Obat\OutObatController;
 use App\Http\Controllers\Obat\StokObatController;
 use App\Http\Controllers\Pesanan\SuratPesananController;
+use App\Http\Controllers\Setting\PermissionController;
 use App\Http\Controllers\Setting\ProfileController;
 use App\Http\Controllers\Setting\RoleController;
-use App\Http\Controllers\Setting\PermissionController;
 use App\Http\Controllers\Setting\UserController;
 use App\Http\Controllers\Supplier\SupplierController;
 use Illuminate\Support\Facades\Auth;
@@ -33,9 +34,9 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/home', [HomeController::class, 'index'])->name('home');
 
-Route::get('/dashboard', [App\Http\Controllers\HomeController::class, 'index'])->name('dashboard');
+Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
 
 Route::prefix('obat')->middleware(['auth'])->group(function () {
     //kategori obat
@@ -138,11 +139,13 @@ Route::prefix('setting')->middleware(['auth'])->group(function () {
     Route::delete('permission/{id}', [PermissionController::class, 'destroy'])->name('permission-delete');
     Route::get('permission/all/data', [PermissionController::class, 'allPermission'])->name('permission-all');
 
-     //User
-     Route::get('user', [UserController::class, 'index'])->name('user');
-     Route::get('user/datatable', [UserController::class, 'datatable'])->name('user-datatable');
-     Route::post('user', [UserController::class, 'store'])->name('user-create');
-     Route::get('user/{id}', [UserController::class, 'show'])->name('user-detail');
-     Route::post('user/{id}', [UserController::class, 'update'])->name('user-update');
-     Route::delete('user/{id}', [UserController::class, 'destroy'])->name('user-delete');
+    //User
+    Route::get('user', [UserController::class, 'index'])->name('user');
+    Route::get('user/datatable', [UserController::class, 'datatable'])->name('user-datatable');
+    Route::post('user', [UserController::class, 'store'])->name('user-create');
+    Route::get('user/{id}', [UserController::class, 'show'])->name('user-detail');
+    Route::post('user/{id}', [UserController::class, 'update'])->name('user-update');
+    Route::delete('user/{id}', [UserController::class, 'destroy'])->name('user-delete');
+
+    Route::get('/notification', [HomeController::class, 'notification'])->name('notification');
 });
