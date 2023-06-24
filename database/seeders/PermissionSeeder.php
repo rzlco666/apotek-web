@@ -52,6 +52,7 @@ class PermissionSeeder extends Seeder
         $user = User::factory()->create([
             'name' => 'Admin',
             'email' => 'admin@example.com',
+            'role_id' => 1,
             'password' => bcrypt('password')
         ]);
         $user->assignRole($adminRole);
@@ -59,6 +60,7 @@ class PermissionSeeder extends Seeder
         $user = User::factory()->create([
             'name' => 'Super Admin',
             'email' => 'superadmin@example.com',
+            'role_id' => 2,
             'password' => bcrypt('password')
         ]);
         $user->assignRole($superadminRole);

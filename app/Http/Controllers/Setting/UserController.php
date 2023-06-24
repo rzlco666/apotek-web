@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Setting;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting\User;
+use App\Models\Setting\Role;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,7 +19,10 @@ class UserController extends Controller
      */
     public function index()
     {
-        return view('setting.user.index');
+        $data = [
+            'roles' => Role::orderBy('id', 'asc')->get(),
+        ];
+        return view('setting.user.index', $data);
     }
 
     /**
@@ -28,7 +32,7 @@ class UserController extends Controller
      */
     public function datatable()
     {
-        $data = User::all();
+        $data = User::with('role')->get();
 
         $actions = '
                     <button type="button" class="btn btn-info btn-xs detail-btn me-1" data-id="{{ $id }}" title="Detail">
@@ -69,6 +73,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|unique:users,name,NULL,id',
             'email' => 'required|email|max:200|unique:users,email,NULL,id',
+            'role_id' => 'required',
             'password' => 'required|min:6|max:20',
         ]);
 
@@ -85,6 +90,7 @@ class UserController extends Controller
         $params = [
             'name' => $request->name,
             'email' => $request->email,
+            'role_id' => $request->role_id,
             'password' => bcrypt($request->password),
         ];
 
@@ -115,7 +121,7 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        $data = User::where('id', $id)->first();
+        $data = User::where('id', $id)->with('role')->first();
 
         if ($data) {
             $result = [
@@ -147,6 +153,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|unique:users,name,'.$id.',id',
             'email' => 'required|email|max:200|unique:users,email,'.$id.',id',
+            'role_id' => 'required',
             'password' => 'nullable',
         ]);
 
@@ -178,6 +185,7 @@ class UserController extends Controller
         }
         $user->name = $request->name;
         $user->email = $request->email;
+        $user->role_id = $request->role_id;
         $user->password = $pass;
 
         if ($user->save()) {

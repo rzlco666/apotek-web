@@ -21,6 +21,7 @@ class User extends Model
         'name',
         'email',
         'password',
+        'role_id',
         'created_by',
         'updated_by',
     ];
@@ -58,5 +59,10 @@ class User extends Model
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function role()
+    {
+        return $this->hasOne(Role::class, 'id', 'role_id');
+    }
 
 }

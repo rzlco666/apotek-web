@@ -2,6 +2,7 @@
 
 @section('css')
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/datatables.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/select2.css') }}">
 @endsection
 
 @section('title')
@@ -83,7 +84,17 @@
                             <label>{{ __('Email') }} <span class="text-danger">*</span></label>
                             <input type="email" name="email" id="email" class="form-control" required>
                         </div>
-
+                        <div class="form-group">
+                            <label>{{ __('Role') }} <span class="text-danger">*</span></label>
+                            <select class="form-control select2" name="role_id" id="role-id" required>
+                                <option value="">Select Role</option>
+                                @if ($roles)
+                                    @foreach ($roles as $row)
+                                        <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                    @endforeach
+                                @endif
+                            </select>
+                        </div>
                         <div class="form-group">
                             <label>{{ __('Password') }} <span class="text-danger">*</span></label>
                             <input type="password" name="password" id="password" class="form-control" required>
@@ -117,6 +128,10 @@
                         <label>{{ __('Email') }}</label>
                         <p id="detail-email" class="form-control"></p>
                     </div>
+                    <div class="form-group">
+                        <label>{{ __('Role') }}</label>
+                        <p id="detail-role" class="form-control"></p>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -131,9 +146,13 @@
     <script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/js/datatable/datatables/datatable.custom.js') }}"></script>
     <script src="{{ asset('assets/js/tooltip-init.js') }}"></script>
+    <script src="{{ asset('assets/js/select2/select2.full.min.js') }}"></script>
 
     <script type="text/javascript">
         $(document).ready(function () {
+            $('.select2').select2({
+                minimumInputLength: 0,
+            });
             var datatable = $('#datatable').DataTable({
                 processing: true,
                 serverSide: true,
@@ -156,6 +175,7 @@
                 $('#user-id').val('')
                 $('#modal-form-label').text('Add User')
                 $('#nama-kategori').val('')
+                $('#role-id').val(null).trigger('change')
 
                 $('.modal-backdrop').remove();
                 $('body').removeClass('modal-open');
@@ -172,6 +192,7 @@
                     let data = response.data
                     $('#nama-kategori').val(data.name)
                     $('#email').val(data.email)
+                    $('#role-id').val(data.role_id).trigger('change')
                     $('#password').val(data.password)
 
                     $('#form-modal').modal('show')
@@ -195,6 +216,7 @@
                     let data = response.data
                     $('#detail-user').html(data.name)
                     $('#detail-email').html(data.email)
+                    $('#detail-role').html(data.role.name)
 
                     $('#detail-modal').modal('show')
                 }).fail((err) => {
