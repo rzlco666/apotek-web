@@ -50,6 +50,8 @@
                                 <th scope="col">Aksi</th>
                                 <th scope="col">Kode</th>
                                 <th scope="col">Nama</th>
+                                <th scope="col">Satuan</th>
+                                <th scope="col">Golongan</th>
                                 <th scope="col">Kategori</th>
                                 <th scope="col">Updated By</th>
                             </tr>
@@ -182,6 +184,8 @@
                     { data: 'action', name: 'action', orderable: false, searchable: false },
                     { data: 'kode_obat', name: 'kode_obat' },
                     { data: 'nama_obat', name: 'nama_obat' },
+                    { data: 'satuan', name: 'satuan' },
+                    { data: 'golongan', name: 'golongan' },
                     { data: 'category_obat.nama_kategori', name: 'category_obat.nama_kategori' },
                     { data: 'last_modified', name: 'last_modified' }
                 ]
