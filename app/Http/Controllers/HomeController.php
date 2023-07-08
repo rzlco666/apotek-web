@@ -2,7 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Faktur\DataFaktur;
+use App\Models\Obat\DataObat;
 use App\Models\Obat\ExpObat;
+use App\Models\Obat\StokObat;
+use App\Models\Pesanan\SuratPesanan;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -24,7 +28,13 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        $totalFaktur = DataFaktur::count();
+        $totalObat = DataObat::count();
+        $totalSuratPesanan = SuratPesanan::count();
+        $expiredMedicines = ExpObat::with('data_obat')->orderBy('tanggal_kadaluwarsa', 'desc')->take(10)->get();
+        $stokObat = StokObat::with('category_obat', 'exp_obat', 'in_obat', 'out_obat')->orderBy('updated_at', 'desc')->take(5)->get();
+
+        return view('home', compact('totalFaktur', 'totalObat', 'totalSuratPesanan', 'expiredMedicines', 'stokObat'));
     }
 
     public function notification(Request $request)
