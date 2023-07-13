@@ -124,24 +124,33 @@
                                             <th></th>
                                             <th>Stok Masuk</th>
                                             <th>Stok Keluar</th>
-                                            <th> </th>
+                                            <th></th>
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        @foreach ($stokObat as $stok)
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <span class="f-14 f-w-600"> <a href="{{ route('stok-obat') }}">{{ $stok->nama_obat }}</a></span>
-                                                </div>
-                                            </td>
-                                            <td>16 August</td>
-                                            <td>{{ $stok->in_obat->total_jumlah_in - $stok->out_obat->total_jumlah_out }}</td>
-                                            <td> <i class="flag-icon flag-icon-gb"></i></td>
-                                            <td>{{ $stok->in_obat->total_jumlah_in }}</td>
-                                            <td>{{ $stok->out_obat->total_jumlah_out }}</td>
-                                            <td><span> <a href="{{ route('stok-obat') }}">Detail</a></span></td>
-                                        </tr>
+                                        @foreach ($stokObat->sortBy(function ($stok) {
+                                            return $stok->in_obat->total_jumlah_in - $stok->out_obat->total_jumlah_out;
+                                        }) as $stok)
+                                            @if ($stok->in_obat->total_jumlah_in > 0 || $stok->out_obat->total_jumlah_out > 0)
+                                                @php
+                                                    $sisaStok = $stok->in_obat->total_jumlah_in - $stok->out_obat->total_jumlah_out;
+                                                @endphp
+                                                @if ($sisaStok < 10)
+                                                    <tr>
+                                                        <td>
+                                                            <div class="d-flex align-items-center">
+                                                                <span class="f-14 f-w-600"><a href="{{ route('stok-obat') }}">{{ $stok->nama_obat }}</a></span>
+                                                            </div>
+                                                        </td>
+                                                        <td>16 August</td>
+                                                        <td>{{ $sisaStok }}</td>
+                                                        <td><i class="flag-icon flag-icon-gb"></i></td>
+                                                        <td>{{ $stok->in_obat->total_jumlah_in }}</td>
+                                                        <td>{{ $stok->out_obat->total_jumlah_out }}</td>
+                                                        <td><span><a href="{{ route('stok-obat') }}">Detail</a></span></td>
+                                                    </tr>
+                                                @endif
+                                            @endif
                                         @endforeach
                                         </tbody>
                                     </table>

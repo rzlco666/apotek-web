@@ -132,10 +132,16 @@
                         render: function ( data, type, row ) {
                             var total_jumlah_in = data.in_obat && data.in_obat.total_jumlah_in ? data.in_obat.total_jumlah_in : 0;
                             var total_jumlah_out = data.out_obat && data.out_obat.total_jumlah_out ? data.out_obat.total_jumlah_out : 0;
-
                             var sisa_stok = total_jumlah_in - total_jumlah_out;
 
                             return isNaN(sisa_stok) || sisa_stok === 0 ? '-' : sisa_stok;
+                        },
+                        "createdCell": function (td, cellData, rowData, row, col) {
+                            var total_jumlah_in = rowData.in_obat && rowData.in_obat.total_jumlah_in ? rowData.in_obat.total_jumlah_in : 0;
+                            var total_jumlah_out = rowData.out_obat && rowData.out_obat.total_jumlah_out ? rowData.out_obat.total_jumlah_out : 0;
+                            var sisa_stok = total_jumlah_in - total_jumlah_out;
+
+                            $(td).attr('data-order', sisa_stok);
                         }
                     },
                     {
@@ -152,7 +158,8 @@
                             return data || '-';
                         }
                     },
-                ]
+                ],
+                order: [[5, 'asc']]
             });
 
             $('#form-modal').on('show.bs.modal', function(){

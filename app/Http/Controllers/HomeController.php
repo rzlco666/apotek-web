@@ -29,7 +29,7 @@ class HomeController extends Controller
     public function index()
     {
         $today = date('Y-m-d');
-        $tomorrow = date('Y-m-d', strtotime('+30 day'));
+        $tomorrow = date('Y-m-d', strtotime('+31 day'));
 
         $totalFaktur = DataFaktur::count();
         $totalObat = DataObat::count();
@@ -40,7 +40,7 @@ class HomeController extends Controller
             ->orderBy('tanggal_kadaluwarsa', 'desc')
             ->take(10)
             ->get();
-        $stokObat = StokObat::with('category_obat', 'exp_obat', 'in_obat', 'out_obat')->orderBy('updated_at', 'desc')->take(5)->get();
+        $stokObat = StokObat::with('category_obat', 'exp_obat', 'in_obat', 'out_obat')->get();
 
         return view('home', compact('totalFaktur', 'totalObat', 'totalSuratPesanan', 'expiredMedicines', 'stokObat'));
     }
