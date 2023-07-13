@@ -19,10 +19,10 @@
                         <div class="login-main">
                             <form class="theme-form" method="POST" action="{{ route('login') }}">
                                 @csrf
-                                <h4 class="text-center">Sign in to account</h4>
-                                <p class="text-center">Enter your email & password to login</p>
+                                <h4 class="text-center">Masuk ke akun</h4>
+                                <p class="text-center">Masukkan email dan kata sandi Anda untuk masuk</p>
                                 <div class="form-group">
-                                    <label class="col-form-label">{{ __('Email Address') }}</label>
+                                    <label class="col-form-label">{{ __('Alamat Email') }}</label>
                                     <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
 
                                     @error('email')
@@ -32,7 +32,7 @@
                                     @enderror
                                 </div>
                                 <div class="form-group">
-                                    <label class="col-form-label">{{ __('Password') }}</label>
+                                    <label class="col-form-label">{{ __('Kata Sandi') }}</label>
                                     <div class="form-input position-relative">
                                         <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="current-password">
 
@@ -48,17 +48,17 @@
                                         <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
 
                                         <label class="form-check-label" for="remember">
-                                            {{ __('Remember Me') }}
+                                            {{ __('Ingat Saya') }}
                                         </label>
-                                    </div><a class="link" href="{{ route('password.request') }}">{{ __('Forgot Your Password?') }}</a>
+                                    </div><a class="link" href="{{ route('password.request') }}">{{ __('Lupa Kata Sandi Anda?') }}</a>
                                     <div class="text-end mt-3">
                                         <button type="submit" class="btn btn-primary btn-block w-100">
-                                            {{ __('Sign in') }}
+                                            {{ __('Masuk') }}
                                         </button>
                                     </div>
                                 </div>
                                 <div class="login-social-title">
-                                    <h6>Or Sign in with                 </h6>
+                                    <h6>Atau masuk dengan                 </h6>
                                 </div>
                                 <div class="form-group">
                                     <ul class="login-social">
@@ -68,7 +68,7 @@
                                         <li><a href="https://www.instagram.com" target="_blank"><i data-feather="instagram"></i></a></li>
                                     </ul>
                                 </div>
-                                <p class="mt-4 mb-0 text-center">Don't have account?<a class="ms-2" href="{{ route('register') }}">Create Account</a></p>
+                                <p class="mt-4 mb-0 text-center">Belum punya akun?<a class="ms-2" href="{{ route('register') }}">Buat Akun</a></p>
                             </form>
                         </div>
                     </div>

@@ -5,11 +5,11 @@
 @endsection
 
 @section('title')
-    Supplier
+    Distributor
 @endsection
 
 @section('prefix')
-    Supplier
+    Distributor
 @endsection
 
 @section('main_content')
@@ -158,7 +158,7 @@
 
             $('#form-modal').on('hidden.bs.modal', function() {
                 $('#supplier-id').val('')
-                $('#modal-form-label').text('Add Supplier')
+                $('#modal-form-label').text('Add Distributor')
                 $('#nama-perusahaan').val('')
                 $('#alamat').val('')
                 $('#telepon').val('')
@@ -172,7 +172,7 @@
                 let url = '{{ route('supplier-detail', ':id') }}'
                 url = url.replace(':id', id)
                 $('#supplier-id').val(id)
-                $('#modal-form-label').text('Edit {{ __('Supplier') }}')
+                $('#modal-form-label').text('Edit {{ __('Distributor') }}')
 
                 $.get(url, function(response) {
                     let data = response.data

@@ -54,7 +54,7 @@
                                 <th scope="col">Jumlah Masuk</th>
                                 <th scope="col">Harga Beli</th>
                                 <th scope="col">Harga Jual</th>
-                                <th scope="col">Supplier</th>
+                                <th scope="col">Distributor</th>
                                 <th scope="col">Updated By</th>
                             </tr>
                             </thead>
@@ -107,7 +107,7 @@
                             <input type="text" name="harga_jual" id="harga-jual" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label>{{ __('Supplier') }} <span class="text-danger">*</span></label>
+                            <label>{{ __('Distributor') }} <span class="text-danger">*</span></label>
                             <select class="form-control select2" name="supplier_id" id="supplier-id" required>
                                 @if ($data_supplier)
                                     @foreach ($data_supplier as $row)
@@ -162,7 +162,7 @@
                         <p id="detail-harga-jual" class="form-control"></p>
                     </div>
                     <div class="form-group">
-                        <label>{{ __('Supplier') }}</label>
+                        <label>{{ __('Distributor') }}</label>
                         <p id="detail-supplier-id" class="form-control"></p>
                     </div>
                 </div>
