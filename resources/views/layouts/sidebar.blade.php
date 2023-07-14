@@ -29,6 +29,8 @@
                   <li><a href="{{ route('exp-obat') }}">Obat Kadaluwarsa</a></li>
                   <li><a href="{{ route('stok-obat') }}">Stok Obat</a></li>
                   <li><a href="{{ route('kategori-obat') }}">Kategori Obat</a></li>
+                  <li><a href="{{ route('satuan') }}">Satuan</a></li>
+                  <li><a href="{{ route('golongan') }}">Golongan</a></li>
               </ul>
               </li>
               <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a class="sidebar-link sidebar-title link-nav" href="{{ route('surat-pesanan') }}"><i data-feather="file-text"> </i><span>Surat Pesanan</span></a></li>

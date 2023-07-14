@@ -3,16 +3,13 @@
 namespace App\Http\Controllers\Obat;
 
 use App\Http\Controllers\Controller;
-use App\Models\Obat\DataObat;
-use App\Models\Obat\KategoriObat;
-use App\Models\Obat\Satuan;
 use App\Models\Obat\Golongan;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
 
-class DataObatController extends Controller
+class GolonganController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -21,13 +18,7 @@ class DataObatController extends Controller
      */
     public function index()
     {
-        $data = [
-            'category_obat' => KategoriObat::orderBy('nama_kategori', 'asc')->get(),
-            'satuan' => Satuan::orderBy('nama_satuan', 'asc')->get(),
-            'golongan' => Golongan::orderBy('nama_golongan', 'asc')->get(),
-        ];
-
-        return view('obat.data_obat.index', $data);
+        return view('obat.golongan.index');
     }
 
     /**
@@ -37,19 +28,19 @@ class DataObatController extends Controller
      */
     public function datatable()
     {
-        $data = DataObat::with('category_obat', 'satuan', 'golongan')->get();
+        $data = Golongan::all();
 
         $actions = '
                     <button type="button" class="btn btn-info btn-xs detail-btn me-1" data-id="{{ $id }}" title="Detail">
                         <i class="icon-eye"></i>
                     </button>
                     ';
-        if (Auth::user()->can('edit obat')) {
+        if (Auth::user()->can('edit kategori obat')) {
             $actions .= '<button class="btn btn-xs btn-warning edit-btn me-1" data-id="{{ $id }}" title="Edit">
                             <i class="icon-pencil"></i>
                         </button>';
         }
-        if (Auth::user()->can('delete obat')) {
+        if (Auth::user()->can('delete kategori obat')) {
             $actions .= '<button class="btn btn-xs btn-danger delete-btn me-1" data-id="{{ $id }}" title="Delete">
                             <i class="icon-trash"></i>
                         </button>';
@@ -76,22 +67,8 @@ class DataObatController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nama_obat' => 'required',
-            'dosis' => 'required',
-            'kategori_obat_id' => 'required',
-            'satuan' => 'required',
-            'golongan' => 'required',
+            'nama_golongan' => 'required|string|unique:golongan,nama_golongan,NULL,id,deleted_at,NULL'
         ]);
-
-        $latestDataObat = DataObat::latest()->first();
-        $lastKodeObat = $latestDataObat ? $latestDataObat->kode_obat : '';
-
-        // Mengambil angka dari kode obat terakhir
-        $lastNumber = intval(substr($lastKodeObat, -2));
-
-        // Membuat kode obat baru dengan menambahkan 1 ke angka terakhir
-        $newNumber = $lastNumber + 1;
-        $newKodeObat = 'OBT-' . str_pad($newNumber, 2, '0', STR_PAD_LEFT);
 
         if (!$validated) {
             $result = [
@@ -104,16 +81,11 @@ class DataObatController extends Controller
         }
 
         $params = [
-            'kode_obat' => $newKodeObat,
-            'nama_obat' => $request->nama_obat,
-            'dosis' => $request->dosis,
-            'kategori_obat_id' => $request->kategori_obat_id,
-            'satuan_id' => $request->satuan,
-            'golongan_id' => $request->golongan,
+            'nama_golongan' => $request->nama_golongan,
             'created_by' => Auth::user()->id
         ];
 
-        $ref_kategori = DataObat::create($params);
+        $ref_kategori = Golongan::create($params);
 
         if ($ref_kategori) {
             $result = [
@@ -140,7 +112,7 @@ class DataObatController extends Controller
      */
     public function show($id)
     {
-        $data = DataObat::where('id', $id)->with('category_obat', 'satuan', 'golongan')->first();
+        $data = Golongan::where('id', $id)->first();
 
         if ($data) {
             $result = [
@@ -170,12 +142,7 @@ class DataObatController extends Controller
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'kode_obat' => 'required|string|unique:obat,kode_obat,'.$id.',id,deleted_at,NULL',
-            'nama_obat' => 'required',
-            'dosis' => 'required',
-            'kategori_obat_id' => 'required',
-            'satuan' => 'required',
-            'golongan' => 'required',
+            'nama_golongan' => 'required|string|unique:golongan,nama_golongan,'.$id.',id,deleted_at,NULL',
         ]);
 
         if (!$validated) {
@@ -188,7 +155,7 @@ class DataObatController extends Controller
             return response()->json($result, $result['code']);
         }
 
-        $ref_kategori = DataObat::where('id', $id)->first();
+        $ref_kategori = Golongan::where('id', $id)->first();
 
         if (!$ref_kategori) {
             $result = [
@@ -199,12 +166,7 @@ class DataObatController extends Controller
             return response()->json($result, $result['code']);
         }
 
-        $ref_kategori->kode_obat = $request->kode_obat;
-        $ref_kategori->nama_obat = $request->nama_obat;
-        $ref_kategori->dosis = $request->dosis;
-        $ref_kategori->kategori_obat_id = $request->kategori_obat_id;
-        $ref_kategori->satuan_id = $request->satuan;
-        $ref_kategori->golongan_id = $request->golongan;
+        $ref_kategori->nama_golongan = $request->nama_golongan;
         $ref_kategori->updated_by = Auth::user()->id;
 
         if ($ref_kategori->save()) {
@@ -232,7 +194,7 @@ class DataObatController extends Controller
      */
     public function destroy($id)
     {
-        $ref_kategori = DataObat::where('id', $id)->first();
+        $ref_kategori = Golongan::where('id', $id)->first();
 
         if (!$ref_kategori) {
             $result = [

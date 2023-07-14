@@ -6,6 +6,8 @@ use App\Http\Controllers\Obat\DataObatController;
 use App\Http\Controllers\Obat\ExpObatController;
 use App\Http\Controllers\Obat\InObatController;
 use App\Http\Controllers\Obat\KategoriObatController;
+use App\Http\Controllers\Obat\SatuanController;
+use App\Http\Controllers\Obat\GolonganController;
 use App\Http\Controllers\Obat\OutObatController;
 use App\Http\Controllers\Obat\StokObatController;
 use App\Http\Controllers\Pesanan\SuratPesananController;
@@ -46,6 +48,22 @@ Route::prefix('obat')->middleware(['auth'])->group(function () {
     Route::get('kategori-obat/{id}', [KategoriObatController::class, 'show'])->name('kategori-obat-detail');
     Route::post('kategori-obat/{id}', [KategoriObatController::class, 'update'])->name('kategori-obat-update');
     Route::delete('kategori-obat/{id}', [KategoriObatController::class, 'destroy'])->name('kategori-obat-delete');
+
+    // satuan
+    Route::get('satuan', [SatuanController::class, 'index'])->name('satuan');
+    Route::get('satuan/datatable', [SatuanController::class, 'datatable'])->name('satuan-datatable');
+    Route::post('satuan', [SatuanController::class, 'store'])->name('satuan-create');
+    Route::get('satuan/{id}', [SatuanController::class, 'show'])->name('satuan-detail');
+    Route::post('satuan/{id}', [SatuanController::class, 'update'])->name('satuan-update');
+    Route::delete('satuan/{id}', [SatuanController::class, 'destroy'])->name('satuan-delete');
+
+    // golongan
+    Route::get('golongan', [GolonganController::class, 'index'])->name('golongan');
+    Route::get('golongan/datatable', [GolonganController::class, 'datatable'])->name('golongan-datatable');
+    Route::post('golongan', [GolonganController::class, 'store'])->name('golongan-create');
+    Route::get('golongan/{id}', [GolonganController::class, 'show'])->name('golongan-detail');
+    Route::post('golongan/{id}', [GolonganController::class, 'update'])->name('golongan-update');
+    Route::delete('golongan/{id}', [GolonganController::class, 'destroy'])->name('golongan-delete');
 
     //data obat
     Route::get('data-obat', [DataObatController::class, 'index'])->name('data-obat');

@@ -111,56 +111,57 @@
     <script type="text/javascript">
         $(document).ready(function () {
             var datatable = $('#datatable').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: '{{ route('stok-obat-datatable') }}',
-                columns: [
-                    { data: 'DT_RowIndex', name: 'DT_RowIndex' },
-                    { data: 'action', name: 'action', orderable: false, searchable: false },
-                    { data: 'nama_obat', name: 'nama_obat' },
-                    { data: 'category_obat.nama_kategori', name: 'category_obat.nama_kategori' },
-                    {
-                        data: 'exp_obat.tanggal_kadaluwarsa',
-                        name: 'exp_obat.tanggal_kadaluwarsa',
-                        render: function ( data, type, row ) {
-                            return data || '-';
-                        }
-                    },
-                    {
-                        data: null,
-                        name: 'sisa_stok',
-                        render: function ( data, type, row ) {
-                            var total_jumlah_in = data.in_obat && data.in_obat.total_jumlah_in ? data.in_obat.total_jumlah_in : 0;
-                            var total_jumlah_out = data.out_obat && data.out_obat.total_jumlah_out ? data.out_obat.total_jumlah_out : 0;
-                            var sisa_stok = total_jumlah_in - total_jumlah_out;
+            processing: true,
+            serverSide: true,
+            ajax: '{{ route('stok-obat-datatable') }}',
+            columns: [
+                { data: 'DT_RowIndex', name: 'DT_RowIndex' },
+                { data: 'action', name: 'action', orderable: false, searchable: false },
+                { data: 'nama_obat', name: 'nama_obat' },
+                { data: 'category_obat.nama_kategori', name: 'category_obat.nama_kategori' },
+                {
+                    data: 'exp_obat.tanggal_kadaluwarsa',
+                    name: 'exp_obat.tanggal_kadaluwarsa',
+                    render: function ( data, type, row ) {
+                        return data || '-';
+                    }
+                },
+                {
+                    data: null,
+                    name: 'sisa_stok',
+                    render: function ( data, type, row ) {
+                        var total_jumlah_in = data.in_obat && data.in_obat.total_jumlah_in ? data.in_obat.total_jumlah_in : 0;
+                        var total_jumlah_out = data.out_obat && data.out_obat.total_jumlah_out ? data.out_obat.total_jumlah_out : 0;
+                        var sisa_stok = total_jumlah_in - total_jumlah_out;
 
-                            return isNaN(sisa_stok) || sisa_stok === 0 ? '-' : sisa_stok;
-                        },
-                        "createdCell": function (td, cellData, rowData, row, col) {
-                            var total_jumlah_in = rowData.in_obat && rowData.in_obat.total_jumlah_in ? rowData.in_obat.total_jumlah_in : 0;
-                            var total_jumlah_out = rowData.out_obat && rowData.out_obat.total_jumlah_out ? rowData.out_obat.total_jumlah_out : 0;
-                            var sisa_stok = total_jumlah_in - total_jumlah_out;
+                        return isNaN(sisa_stok) || sisa_stok === 0 ? '-' : sisa_stok;
+                    },
+                    "createdCell": function (td, cellData, rowData, row, col) {
+                        var total_jumlah_in = rowData.in_obat && rowData.in_obat.total_jumlah_in ? rowData.in_obat.total_jumlah_in : 0;
+                        var total_jumlah_out = rowData.out_obat && rowData.out_obat.total_jumlah_out ? rowData.out_obat.total_jumlah_out : 0;
+                        var sisa_stok = total_jumlah_in - total_jumlah_out;
 
-                            $(td).attr('data-order', sisa_stok);
-                        }
-                    },
-                    {
-                        data: 'in_obat.total_jumlah_in',
-                        name: 'in_obat.total_jumlah_in',
-                        render: function ( data, type, row ) {
-                            return data || '-';
-                        }
-                    },
-                    {
-                        data: 'out_obat.total_jumlah_out',
-                        name: 'out_obat.total_jumlah_out',
-                        render: function ( data, type, row ) {
-                            return data || '-';
-                        }
-                    },
-                ],
-                order: [[5, 'asc']]
-            });
+                        $(td).attr('data-order', sisa_stok);
+                    }
+                },
+                {
+                    data: 'in_obat.total_jumlah_in',
+                    name: 'in_obat.total_jumlah_in',
+                    render: function ( data, type, row ) {
+                        return data || '-';
+                    }
+                },
+                {
+                    data: 'out_obat.total_jumlah_out',
+                    name: 'out_obat.total_jumlah_out',
+                    render: function ( data, type, row ) {
+                        return data || '-';
+                    }
+                },
+            ],
+            order: [[5, 'asc']] // Urutan kolom ke-5 (sisa_stok) secara menaik
+        });
+
 
             $('#form-modal').on('show.bs.modal', function(){
                 $.fn.modal.Constructor.prototype._enforceFocus = function() {};

@@ -9,38 +9,18 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
 
-class DataObat extends Model
+class Golongan extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'obat';
+    protected $table = 'golongan';
 
     protected $fillable = [
-        'kode_obat',
-        'nama_obat',
-        'dosis',
-        'kategori_obat_id',
-        'satuan_id',
-        'golongan_id',
+        'nama_golongan',
         'created_by',
         'updated_by',
         'deleted_by'
     ];
-
-    public function category_obat()
-    {
-        return $this->hasOne(KategoriObat::class, 'id', 'kategori_obat_id');
-    }
-
-    public function satuan()
-    {
-        return $this->hasOne(Satuan::class, 'id', 'satuan_id');
-    }
-
-    public function golongan()
-    {
-        return $this->hasOne(Golongan::class, 'id', 'golongan_id');
-    }
 
     // adjust boot function
     public static function boot()
