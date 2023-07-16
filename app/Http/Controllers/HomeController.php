@@ -35,9 +35,8 @@ class HomeController extends Controller
         $totalObat = DataObat::count();
         $totalSuratPesanan = SuratPesanan::count();
         $expiredMedicines = ExpObat::with('data_obat')
-            ->whereDate('tanggal_kadaluwarsa', $today)
-            ->orWhereDate('tanggal_kadaluwarsa', $tomorrow)
-            ->orderBy('tanggal_kadaluwarsa', 'desc')
+            ->whereBetween('tanggal_kadaluwarsa', [$today, $tomorrow])
+            ->orderBy('tanggal_kadaluwarsa', 'asc')
             ->take(10)
             ->get();
         $stokObat = StokObat::with('category_obat', 'exp_obat', 'in_obat', 'out_obat')->get();
@@ -51,8 +50,7 @@ class HomeController extends Controller
         $tomorrow = date('Y-m-d', strtotime('+1 day'));
 
         $data = ExpObat::with('data_obat')
-            ->whereDate('tanggal_kadaluwarsa', $today)
-            ->orWhereDate('tanggal_kadaluwarsa', $tomorrow)
+            ->whereBetween('tanggal_kadaluwarsa', [$today, $tomorrow])
             ->orderBy('tanggal_kadaluwarsa', 'asc')
             ->limit(5)
             ->get();
