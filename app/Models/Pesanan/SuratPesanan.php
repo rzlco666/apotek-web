@@ -3,6 +3,7 @@
 namespace App\Models\Pesanan;
 
 use App\Models\Obat\DataObat;
+use App\Models\Supplier\Supplier;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,7 +18,8 @@ class SuratPesanan extends Model
     protected $table = 'surat_pesanan';
 
     protected $fillable = [
-        'nama_perusahaan',
+        'kode_pesanan',
+        'supplier_id',
         'tanggal_pesanan',
         'jumlah_out',
         'obat_id',
@@ -45,6 +47,11 @@ class SuratPesanan extends Model
     public function data_obat()
     {
         return $this->hasOne(DataObat::class, 'id', 'obat_id');
+    }
+
+    public function supplier()
+    {
+        return $this->hasOne(Supplier::class, 'id', 'supplier_id');
     }
 
     public function getCreatedByNameAttribute()

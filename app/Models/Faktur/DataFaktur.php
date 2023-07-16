@@ -4,6 +4,7 @@ namespace App\Models\Faktur;
 
 use App\Models\Obat\DataObat;
 use App\Models\Supplier\Supplier;
+use App\Models\Pesanan\SuratPesanan;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,6 +20,7 @@ class DataFaktur extends Model
 
     protected $fillable = [
         'obat_id',
+        'id_surat_pesanan',
         'tanggal_faktur',
         'total_obat',
         'total_bayar',
@@ -37,6 +39,12 @@ class DataFaktur extends Model
     {
         return $this->hasOne(Supplier::class, 'id', 'supplier_id');
     }
+
+    public function data_surat_pesanan()
+    {
+        return $this->hasOne(SuratPesanan::class, 'id', 'id_surat_pesanan');
+    }
+
 
     // adjust boot function
     public static function boot()

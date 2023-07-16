@@ -74,7 +74,13 @@
                         <input type="hidden" name="surat_pesanan_id" id="surat-pesanan-id">
                         <div class="form-group">
                             <label>{{ __('Nama Perusahaan') }} <span class="text-danger">*</span></label>
-                            <input type="text" name="nama_perusahaan" id="nama-perusahaan" class="form-control" required>
+                            <select class="form-control select2" name="nama_perusahaan" id="nama-perusahaan" required>
+                                @if ($data_supplier)
+                                    @foreach ($data_supplier as $row)
+                                        <option value="{{ $row->id }}">{{ $row->nama_perusahaan }}</option>
+                                    @endforeach
+                                @endif
+                            </select>
                         </div>
                         <div class="form-group">
                             <label>{{ __('Tanggal Pesan') }} <span class="text-danger">*</span></label>
@@ -155,9 +161,7 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
-            $('.select2').select2({
-                minimumInputLength: 0,
-            });
+            $('.select2').select2();
 
             $('#tanggal-pesanan').datepicker({
                 language: 'en',
@@ -214,7 +218,13 @@
                 columns: [
                     { data: 'DT_RowIndex', name: 'DT_RowIndex' },
                     { data: 'action', name: 'action', orderable: false, searchable: false },
-                    { data: 'nama_perusahaan', name: 'nama_perusahaan' },
+                    {
+                        data: 'supplier.nama_perusahaan',
+                        name: 'supplier.nama_perusahaan',
+                        render: function(data, type, row) {
+                            return data || '-';
+                        }
+                    },
                     { data: 'tanggal_pesanan', name: 'tanggal_pesanan' },
                     {
                         data: 'obat',
@@ -264,8 +274,8 @@
                 $.get(url, function(response) {
                     let data = response.data
                     $('#obat-id').val(data.obat_id).trigger('change')
-                    $('#nama-perusahaan').val(data.nama_perusahaan)
-                    $('#tanggal-pesanan').val(data.tanggal_keluar)
+                    $('#nama-perusahaan').val(data.supplier_id).trigger('change')
+                    $('#tanggal-pesanan').val(data.tanggal_pesanan)
                     $('#jumlah-out').val(data.jumlah_out)
 
                     $('#form-modal').modal('show')
@@ -288,7 +298,7 @@
                 $.get(url, function(response) {
                     let data = response.data
                     $('#detail-tanggal-pesanan').html(data.tanggal_pesanan)
-                    $('#detail-nama-perusahaan').html(data.nama_perusahaan)
+                    $('#detail-nama-perusahaan').html(data.supplier.nama_perusahaan)
 
                     var obatData = JSON.parse(data.obat);
                     var obatTable = '<table class="table table-bordered">';

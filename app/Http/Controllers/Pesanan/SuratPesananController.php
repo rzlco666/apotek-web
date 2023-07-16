@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Pesanan;
 use App\Http\Controllers\Controller;
 use App\Models\Obat\DataObat;
 use App\Models\Pesanan\SuratPesanan;
+use App\Models\Supplier\Supplier;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -21,6 +22,7 @@ class SuratPesananController extends Controller
     {
         $data = [
             'data_obat' => DataObat::orderBy('nama_obat', 'asc')->get(),
+            'data_supplier' => Supplier::orderBy('nama_perusahaan', 'asc')->get(),
         ];
 
         return view('pesanan.surat_pesanan.index', $data);
@@ -33,7 +35,7 @@ class SuratPesananController extends Controller
      */
     public function datatable()
     {
-        $data = SuratPesanan::with('data_obat')->get();
+        $data = SuratPesanan::with('data_obat', 'supplier')->get();
 
         $actions = '
                     <button type="button" class="btn btn-info btn-xs detail-btn me-1" data-id="{{ $id }}" title="Detail">
@@ -82,6 +84,16 @@ class SuratPesananController extends Controller
             'jumlah_out.*' => 'required',
         ]);
 
+        $latestDataPesanan = SuratPesanan::latest()->first();
+        $lastKodePesanan = $latestDataPesanan ? $latestDataPesanan->kode_pesanan : '';
+
+        // Mengambil angka dari kode obat terakhir
+        $lastNumber = intval(substr($lastKodePesanan, -2));
+
+        // Membuat kode obat baru dengan menambahkan 1 ke angka terakhir
+        $newNumber = $lastNumber + 1;
+        $newKodePesanan = 'P-' . str_pad($newNumber, 2, '0', STR_PAD_LEFT);
+
         if (!$validated) {
             $result = [
                 'code' => 400,
@@ -93,7 +105,8 @@ class SuratPesananController extends Controller
         }
 
         $params = [
-            'nama_perusahaan' => $request->nama_perusahaan,
+            'kode_pesanan' => $newKodePesanan,
+            'supplier_id' => $request->nama_perusahaan,
             'tanggal_pesanan' => $request->tanggal_pesanan,
             'created_by' => Auth::user()->id
         ];
@@ -137,7 +150,7 @@ class SuratPesananController extends Controller
      */
     public function show($id)
     {
-        $data = SuratPesanan::where('id', $id)->with('data_obat', 'data_obat.category_obat')->first();
+        $data = SuratPesanan::where('id', $id)->with('data_obat', 'data_obat.category_obat', 'supplier')->first();
 
         if ($data) {
             $result = [
@@ -206,7 +219,7 @@ class SuratPesananController extends Controller
             return response()->json($result, $result['code']);
         }
 
-        $suratPesanan->nama_perusahaan = $request->nama_perusahaan;
+        $suratPesanan->supplier_id = $request->nama_perusahaan;
         $suratPesanan->tanggal_pesanan = $request->tanggal_pesanan;
 
         if ($suratPesanan) {

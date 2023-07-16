@@ -4,12 +4,16 @@ namespace App\Http\Controllers\Faktur;
 
 use App\Http\Controllers\Controller;
 use App\Models\Faktur\DataFaktur;
+use App\Models\Pesanan\SuratPesanan;
 use App\Models\Obat\DataObat;
+use App\Models\Obat\InObat;
+use App\Models\Obat\ExpObat;
 use App\Models\Supplier\Supplier;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
+use Carbon\Carbon;
 
 class DataFakturController extends Controller
 {
@@ -23,6 +27,7 @@ class DataFakturController extends Controller
         $data = [
             'data_obat' => DataObat::orderBy('nama_obat', 'asc')->get(),
             'data_supplier' => Supplier::orderBy('nama_perusahaan', 'asc')->get(),
+            'data_surat_pesanan' => SuratPesanan::orderBy('id', 'asc')->get(),
         ];
 
         return view('faktur.index', $data);
@@ -35,7 +40,7 @@ class DataFakturController extends Controller
      */
     public function datatable()
     {
-        $data = DataFaktur::with('data_obat', 'data_supplier')->get();
+        $data = DataFaktur::with('data_obat', 'data_supplier', 'data_surat_pesanan')->get();
 
         $actions = '<button type="button" class="btn btn-info btn-xs detail-btn me-1" data-id="{{ $id }}" title="Detail">
                         <i class="icon-eye"></i>
@@ -75,10 +80,14 @@ class DataFakturController extends Controller
         $validated = $request->validate([
             'obat_id.*' => 'required',
             'jumlah.*' => 'required',
+            'harga_jual.*' => 'required',
+            'harga_beli.*' => 'required',
+            'tanggal_kadaluwarsa.*' => 'required',
             'tanggal_faktur' => 'required',
             'total_obat' => 'required',
             'total_bayar' => 'required',
             'supplier_id' => 'required',
+            'id_surat_pesanan' => 'required',
         ]);
 
         if (!$validated) {
@@ -98,20 +107,37 @@ class DataFakturController extends Controller
             'total_obat' => $request->total_obat,
             'total_bayar' => $total_bayar,
             'supplier_id' => $request->supplier_id,
+            'id_surat_pesanan' => $request->id_surat_pesanan,
             'created_by' => Auth::user()->id
         ];
 
         $ref_kategori = DataFaktur::create($params);
-
         if ($ref_kategori) {
             $obatData = [];
             foreach ($request->obat_id as $index => $obatId) {
                 $obatArr = explode('-', $obatId);
                 $obatData[] = [
                     'obat_id' => $obatArr[0],
-                    'nama_obat' => $obatArr[1],
-                    'jumlah' => $request->jumlah[$index]
+                    'nama_obat' => $this->getNameObat($obatArr[0]),
+                    'jumlah' => $request->jumlah[$index],
+                    'harga_jual' => $request->harga_jual[$index],
+                    'harga_beli' => $request->harga_beli[$index],
+                    'tanggal_kadaluwarsa' => $request->tanggal_kadaluwarsa[$index],
                 ];
+
+                $dataObatIn['obat_id'] = $obatArr[0];
+                $dataObatIn['tanggal_masuk'] = Carbon::now();
+                $dataObatIn['jumlah_in'] = $request->jumlah[$index];
+                $dataObatIn['harga_beli'] = $request->harga_beli[$index];
+                $dataObatIn['harga_jual'] = $request->harga_jual[$index];
+                $dataObatIn['supplier_id'] = $request->supplier_id;
+                $dataObatIn['created_by'] = Auth::user()->id;
+                InObat::create($dataObatIn);
+
+                $dataObatExp['obat_id'] = $obatArr[0];
+                $dataObatExp['tanggal_kadaluwarsa'] = $request->tanggal_kadaluwarsa[$index];
+                $dataObatExp['created_by'] = Auth::user()->id;
+                ExpObat::create($dataObatExp);
             }
             $ref_kategori->obat = $obatData;
             $ref_kategori->save();
@@ -140,7 +166,7 @@ class DataFakturController extends Controller
      */
     public function show($id)
     {
-        $data = DataFaktur::where('id', $id)->with('data_obat', 'data_obat.category_obat', 'data_supplier')->first();
+        $data = DataFaktur::where('id', $id)->with('data_obat', 'data_obat.category_obat', 'data_supplier', 'data_surat_pesanan')->first();
 
         if ($data) {
             $result = [
@@ -172,10 +198,14 @@ class DataFakturController extends Controller
         $validated = $request->validate([
             'obat_id.*' => 'required',
             'jumlah.*' => 'required',
+            'harga_jual.*' => 'required',
+            'harga_beli.*' => 'required',
+            'tanggal_kadaluwarsa.*' => 'required',
             'tanggal_faktur' => 'required',
             'total_obat' => 'required',
             'total_bayar' => 'required',
             'supplier_id' => 'required',
+            'id_surat_pesanan' => 'required',
         ]);
 
         if (!$validated) {
@@ -205,6 +235,7 @@ class DataFakturController extends Controller
         $ref_kategori->total_obat = $request->total_obat;
         $ref_kategori->total_bayar = $total_bayar;
         $ref_kategori->supplier_id = $request->supplier_id;
+        $ref_kategori->id_surat_pesanan = $request->id_surat_pesanan;
         $ref_kategori->updated_by = Auth::user()->id;
 
         if ($ref_kategori) {
@@ -213,9 +244,26 @@ class DataFakturController extends Controller
                 $obatArr = explode('-', $obatId);
                 $obatData[] = [
                     'obat_id' => $obatArr[0],
-                    'nama_obat' => $obatArr[1],
-                    'jumlah' => $request->jumlah[$index]
+                    'nama_obat' => $this->getNameObat($obatArr[0]),
+                    'jumlah' => $request->jumlah[$index],
+                    'harga_jual' => $request->harga_jual[$index],
+                    'harga_beli' => $request->harga_beli[$index],
+                    'tanggal_kadaluwarsa' => $request->tanggal_kadaluwarsa[$index],
                 ];
+
+                $dataObatIn['obat_id'] = $obatArr[0];
+                $dataObatIn['tanggal_masuk'] = Carbon::now();
+                $dataObatIn['jumlah_in'] = $request->jumlah[$index];
+                $dataObatIn['harga_beli'] = $request->harga_beli[$index];
+                $dataObatIn['harga_jual'] = $request->harga_jual[$index];
+                $dataObatIn['supplier_id'] = $request->supplier_id;
+                $dataObatIn['created_by'] = Auth::user()->id;
+                InObat::create($dataObatIn);
+
+                $dataObatExp['obat_id'] = $obatArr[0];
+                $dataObatExp['tanggal_kadaluwarsa'] = $request->tanggal_kadaluwarsa[$index];
+                $dataObatExp['created_by'] = Auth::user()->id;
+                ExpObat::create($dataObatExp);
             }
             $ref_kategori->obat = $obatData;
             $ref_kategori->save();
@@ -269,5 +317,13 @@ class DataFakturController extends Controller
             ];
         }
         return response()->json($result, $result['code']);
+    }
+
+    private function getNameObat($id)
+    {
+        return DataObat::select('nama_obat')
+        ->where('id','=',$id)
+        ->first()
+        ->nama_obat;
     }
 }
