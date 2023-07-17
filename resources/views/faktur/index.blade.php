@@ -81,6 +81,7 @@
                         <div class="form-group">
                             <label>{{ __('Surat Pesanan') }} <span class="text-danger">*</span></label>
                             <select class="form-control select2" name="id_surat_pesanan" id="pesanan-id" required>
+                                <option value="0" selected disabled>-Select here-</option>
                                 @if ($data_surat_pesanan)
                                     @foreach ($data_surat_pesanan as $row)
                                         <option value="{{ $row->id }}">{{ $row->kode_pesanan }}</option>
@@ -213,72 +214,77 @@
             var dataObat = {!! json_encode($data_obat) !!};
 
             // Fungsi untuk menambahkan input field baru
-            function addNewInputField(obat) {
-                // Menghitung jumlah form input yang sudah ada
-                var inputFieldCount = $('.form-group.row').length;
+            function addNewInputField(obatData) {
+            // Menghitung jumlah form input yang sudah ada
+            var inputFieldCount = $('.form-group.row').length;
 
-                // Menggandakan template input field
-                var newInputField = $('#obat-row-0').clone().attr('id', 'obat-row-' + inputFieldCount);
+            // Menggandakan template input field
+            var newInputField = $('#obat-row-0').clone().attr('id', 'obat-row-' + inputFieldCount);
 
-                // Mengatur nilai pada select obat dan membersihkan nilai input lainnya
-                newInputField.find('.obat').empty(); // kosongkan select
-                var option2 = $('<option>').val(obat.obat_id).text(obat.nama_obat);
-                newInputField.find('.obat').append(option2); // isi dengan obat dari data_surat_pesanan
-                newInputField.find('.jumlah').val('');
-                newInputField.find('.harga_jual').val('');
-                newInputField.find('.harga_beli').val('');
-                newInputField.find('.tanggal_kadaluwarsa').val('');
+            // Mengatur nilai pada select obat dan membersihkan nilai input lainnya
+            newInputField.find('.obat').empty(); // kosongkan select
 
-                // Menambahkan form input baru ke dalam div
-                tambahInputDiv.append(newInputField);
+            // Menambahkan option pada select obat
+            obatData.forEach(function(obat) {
+                var option = $('<option>').val(obat.obat_id).text(obat.nama_obat);
+                newInputField.find('.obat').append(option);
+            });
+
+            newInputField.find('.jumlah').val('');
+            newInputField.find('.harga_jual').val('');
+            newInputField.find('.harga_beli').val('');
+            newInputField.find('.tanggal_kadaluwarsa').val('');
+
+            // Menambahkan form input baru ke dalam div
+            tambahInputDiv.append(newInputField);
             }
 
             pesananIdSelect.on('change', function() {
-                var pesananId = $(this).val();
-                var selectedPesanan = {!! json_encode($data_surat_pesanan) !!}.find(function(pesanan) {
-                    return pesanan.id == pesananId;
+            var pesananId = $(this).val();
+            var selectedPesanan = {!! json_encode($data_surat_pesanan) !!}.find(function(pesanan) {
+                return pesanan.id == pesananId;
+            });
+
+            // Menghapus semua input field kecuali template
+            tambahInputDiv.find('.form-group.row:gt(0)').remove();
+
+            if (selectedPesanan) {
+                supplierIdSelect.val(selectedPesanan.supplier_id).trigger('change');
+
+                var obatData = JSON.parse(selectedPesanan.obat);
+
+                obatData.forEach(function(obat, index) {
+                if (index == 0) {
+                    // Mengatur nilai pada input field pertama (template)
+                    var firstInputField = $('#obat-row-0');
+                    firstInputField.find('.obat').empty(); // kosongkan select
+                    var option = $('<option>').val(obat.obat_id).text(obat.nama_obat);
+                    firstInputField.find('.obat').append(option); // isi dengan obat dari data_surat_pesanan
+                    firstInputField.find('.jumlah').val('');
+                    firstInputField.find('.harga_jual').val('');
+                    firstInputField.find('.harga_beli').val('');
+                    firstInputField.find('.tanggal_kadaluwarsa').val('');
+                } else {
+                    // Menambahkan input field baru untuk obat lainnya
+                    // addNewInputField(obatData);
+                }
                 });
 
-                // Menghapus semua input field kecuali template
-                tambahInputDiv.find('.form-group.row:gt(0)').remove();
-
-                if (selectedPesanan) {
-                    supplierIdSelect.val(selectedPesanan.supplier_id).trigger('change');
-
-                    var obatData = JSON.parse(selectedPesanan.obat);
-                    obatData.forEach(function(obat, index) {
-                        console.log(obat);
-                        console.log(index == 0);
-                        if (index == 0) {
-                            // Mengatur nilai pada input field pertama (template)
-                            var firstInputField = $('#obat-row-0');
-                            firstInputField.find('.obat').empty(); // kosongkan select
-                            var option = $('<option>').val(obat.obat_id).text(obat.nama_obat);
-                            firstInputField.find('.obat').append(option); // isi dengan obat dari data_surat_pesanan
-                            firstInputField.find('.jumlah').val('');
-                            firstInputField.find('.harga_jual').val('');
-                            firstInputField.find('.harga_beli').val('');
-                            firstInputField.find('.tanggal_kadaluwarsa').val('');
-                        } else {
-                            // Menambahkan input field baru untuk obat lainnya
-                            addNewInputField(obat);
-                        }
-                    });
-
-                    // Mengatur ulang semua opsi select obat lainnya untuk mencerminkan data obat baru
-                    $('.obat').each(function() {
-                        var select = $(this);
-                        select.empty();
-                        obatData.forEach(function(obat) {
-                            var option = $('<option>').val(obat.obat_id).text(obat.nama_obat);
-                            select.append(option);
-                        });
-                    });
-                }
+                // Mengatur ulang semua opsi select obat lainnya untuk mencerminkan data obat baru
+                $('.obat').each(function() {
+                var select = $(this);
+                select.empty();
+                obatData.forEach(function(obat) {
+                    var option = $('<option>').val(obat.obat_id).text(obat.nama_obat);
+                    select.append(option);
+                });
+                });
+            }
             });
 
             // Inisialisasi opsi obat dan supplier pada saat halaman dimuat
             pesananIdSelect.trigger('change');
+
 
 
             $('.select2').select2({
@@ -295,45 +301,54 @@
 
             var rowCounter = 1;
 
-            $('#add-button').on('click', function () {
-                var html = `
-                <div class="form-group row" id="obat-row-${rowCounter}">
-                    <div class="col-md-6">
-                        <label>{{ __('Obat') }} <span class="text-danger">*</span></label>
-                        <select class="form-control select2 obat" name="obat_id[]" required>
-                            @if ($data_obat)
-                @foreach ($data_obat as $row)
-                <option value="{{ $row->id.'-'.$row->nama_obat }}">{{ $row->kode_obat }} - {{ $row->nama_obat }}</option>
-                @endforeach
-                @endif
-                </select>
-            </div>
-            <div class="col-md-4">
-                <label>{{ __('Jumlah') }} <span class="text-danger">*</span></label>
-                        <input type="number" name="jumlah[]" class="form-control" required>
-                    </div>
-                    <div class="col-md-6">
-                                    <label>{{ __('Harga Jual') }} <span class="text-danger">*</span></label>
-                                    <input type="number" name="harga_jual[]" class="form-control" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label>{{ __('Harga Beli') }} <span class="text-danger">*</span></label>
-                                    <input type="number" name="harga_beli[]" class="form-control" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label>{{ __('Tanggal Kadaluwarsa') }} <span class="text-danger">*</span></label>
-                                    <input type="date" name="tanggal_kadaluwarsa[]" class="form-control" required>
-                                </div>
-                    <div class="col-md-2">
-                        <button type="button" class="btn btn-danger btn-xs remove-row" data-row="${rowCounter}"><i class="icon-minus"></i></button>
-                    </div>
-                </div>
-                `;
+            $('#add-button').on('click', function() {
+                    var pesananId = $('#pesanan-id').val();
+                    var selectedPesanan = {!! json_encode($data_surat_pesanan) !!}.find(function(pesanan) {
+                        return pesanan.id == pesananId;
+                    });
 
-                $('#tambah-input').append(html);
-                $('.select2').select2();
-                rowCounter++;
-            });
+                    var obatData = [];
+                    if (selectedPesanan) {
+                        obatData = JSON.parse(selectedPesanan.obat);
+                    }
+
+                    var obatOptions = obatData.map(obat => `<option value="${obat.obat_id}">${obat.nama_obat}</option>`).join('');
+
+                    var html = `
+                        <div class="form-group row" id="obat-row-${rowCounter}">
+                        <div class="col-md-6">
+                            <label>{{ __('Obat') }} <span class="text-danger">*</span></label>
+                            <select class="form-control select2 obat" name="obat_id[]" required>
+                            ${obatOptions}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label>{{ __('Jumlah') }} <span class="text-danger">*</span></label>
+                            <input type="number" name="jumlah[]" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label>{{ __('Harga Jual') }} <span class="text-danger">*</span></label>
+                            <input type="number" name="harga_jual[]" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label>{{ __('Harga Beli') }} <span class="text-danger">*</span></label>
+                            <input type="number" name="harga_beli[]" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label>{{ __('Tanggal Kadaluwarsa') }} <span class="text-danger">*</span></label>
+                            <input type="date" name="tanggal_kadaluwarsa[]" class="form-control" required>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-danger btn-xs remove-row" data-row="${rowCounter}"><i class="icon-minus"></i></button>
+                        </div>
+                        </div>
+                    `;
+
+                    $('#tambah-input').append(html);
+                    $('.select2').select2();
+                    rowCounter++;
+                    });
+
 
             $(document).on('click', '.remove-row', function () {
                 var row = $(this).data('row');
