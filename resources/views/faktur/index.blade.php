@@ -107,8 +107,12 @@
                                     </select>
                                 </div>
                                 <div class="col-md-4">
-                                    <label>{{ __('Jumlah') }} <span class="text-danger">*</span></label>
+                                    <label>{{ __('Jumlah Datang') }} <span class="text-danger">*</span></label>
                                     <input type="number" name="jumlah[]" class="form-control" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label>{{ __('Jumlah Pesan') }} <span class="text-danger">*</span></label>
+                                    <input type="number" name="jumlah_pesan[]" class="form-control" required>
                                 </div>
                                 <div class="col-md-6">
                                     <label>{{ __('Harga Jual') }} <span class="text-danger">*</span></label>
@@ -231,6 +235,7 @@
             });
 
             newInputField.find('.jumlah').val('');
+            newInputField.find('.jumlah_pesan').val('');
             newInputField.find('.harga_jual').val('');
             newInputField.find('.harga_beli').val('');
             newInputField.find('.tanggal_kadaluwarsa').val('');
@@ -261,6 +266,7 @@
                     var option = $('<option>').val(obat.obat_id).text(obat.nama_obat);
                     firstInputField.find('.obat').append(option); // isi dengan obat dari data_surat_pesanan
                     firstInputField.find('.jumlah').val('');
+                    firstInputField.find('.jumlah_pesan').val('');
                     firstInputField.find('.harga_jual').val('');
                     firstInputField.find('.harga_beli').val('');
                     firstInputField.find('.tanggal_kadaluwarsa').val('');
@@ -324,8 +330,12 @@
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label>{{ __('Jumlah') }} <span class="text-danger">*</span></label>
+                            <label>{{ __('Jumlah Datang') }} <span class="text-danger">*</span></label>
                             <input type="number" name="jumlah[]" class="form-control" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label>{{ __('Jumlah Pesan') }} <span class="text-danger">*</span></label>
+                            <input type="number" name="jumlah_pesan[]" class="form-control" required>
                         </div>
                         <div class="col-md-6">
                             <label>{{ __('Harga Jual') }} <span class="text-danger">*</span></label>

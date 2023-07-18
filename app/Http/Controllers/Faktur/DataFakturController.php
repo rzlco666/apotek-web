@@ -80,6 +80,7 @@ class DataFakturController extends Controller
         $validated = $request->validate([
             'obat_id.*' => 'required',
             'jumlah.*' => 'required',
+            'jumlah_pesan.*' => 'required',
             'harga_jual.*' => 'required',
             'harga_beli.*' => 'required',
             'tanggal_kadaluwarsa.*' => 'required',
@@ -120,6 +121,7 @@ class DataFakturController extends Controller
                     'obat_id' => $obatArr[0],
                     'nama_obat' => $this->getNameObat($obatArr[0]),
                     'jumlah' => $request->jumlah[$index],
+                    'jumlah_pesan' => $request->jumlah_pesan[$index],
                     'harga_jual' => $request->harga_jual[$index],
                     'harga_beli' => $request->harga_beli[$index],
                     'tanggal_kadaluwarsa' => $request->tanggal_kadaluwarsa[$index],
@@ -198,6 +200,7 @@ class DataFakturController extends Controller
         $validated = $request->validate([
             'obat_id.*' => 'required',
             'jumlah.*' => 'required',
+            'jumlah_pesan.*' => 'required',
             'harga_jual.*' => 'required',
             'harga_beli.*' => 'required',
             'tanggal_kadaluwarsa.*' => 'required',
@@ -246,6 +249,7 @@ class DataFakturController extends Controller
                     'obat_id' => $obatArr[0],
                     'nama_obat' => $this->getNameObat($obatArr[0]),
                     'jumlah' => $request->jumlah[$index],
+                    'jumlah_pesan' => $request->jumlah_pesan[$index],
                     'harga_jual' => $request->harga_jual[$index],
                     'harga_beli' => $request->harga_beli[$index],
                     'tanggal_kadaluwarsa' => $request->tanggal_kadaluwarsa[$index],
