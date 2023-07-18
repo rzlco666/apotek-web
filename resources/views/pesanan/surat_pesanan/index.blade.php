@@ -44,6 +44,7 @@
                             <tr class="border-bottom-primary">
                                 <th scope="col" width="20px">No</th>
                                 <th scope="col">Aksi</th>
+                                <th scope="col">Kode Pesanan</th>
                                 <th scope="col">Nama Perusahaan</th>
                                 <th scope="col">Tanggal Pesanan</th>
                                 <th scope="col">Obat</th>
@@ -221,6 +222,7 @@
                 columns: [
                     { data: 'DT_RowIndex', name: 'DT_RowIndex' },
                     { data: 'action', name: 'action', orderable: false, searchable: false },
+                    { data: 'kode_pesanan', name: 'kode_pesanan' },
                     {
                         data: 'supplier.nama_perusahaan',
                         name: 'supplier.nama_perusahaan',
