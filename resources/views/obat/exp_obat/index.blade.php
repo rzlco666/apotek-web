@@ -36,13 +36,13 @@
         <div class="row">
             <div class="col-sm-12">
                 <div class="card">
-                    <div class="card-header">
+                    {{--<div class="card-header">
                         @can('create obat')
                             <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#form-modal">
                                 <i class="icon-plus"></i> Tambah @yield('title')
                             </button>
                         @endcan
-                    </div>
+                    </div>--}}
                     <div class="card-body">
                         <table class="table table-bordered" id="datatable">
                             <thead>
