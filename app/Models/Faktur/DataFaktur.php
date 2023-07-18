@@ -25,6 +25,11 @@ class DataFaktur extends Model
         'total_obat',
         'total_bayar',
         'supplier_id',
+        'bukti',
+        'bukti_origin',
+        'bukti_path',
+        'bukti_type',
+        'bukti_size',
         'created_by',
         'updated_by',
         'deleted_by'

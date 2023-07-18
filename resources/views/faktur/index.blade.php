@@ -137,6 +137,11 @@
                             <input type="text" name="total_bayar" id="total-bayar" class="form-control" required>
                         </div>
                         <div class="form-group">
+                            <label>{{ __('Bukti Faktur') }} <span class="text-danger">*</span></label>
+                            <input type="file" name="bukti" id="bukti" class="form-control">
+                            <small class="text-danger">Ext: jpeg,jpg,png,pdf,doc,docx | Max size: 2MB</small>
+                        </div>
+                        <div class="form-group">
                             <label>{{ __('Distributor') }} <span class="text-danger">*</span></label>
                             <select class="form-control select2" name="supplier_id" id="supplier-id" required>
                                 @if ($data_supplier)
@@ -182,6 +187,10 @@
                     <div class="form-group">
                         <label>{{ __('Total Bayar') }}</label>
                         <p id="detail-total-bayar" class="form-control"></p>
+                    </div>
+                    <div class="form-group">
+                        <label>{{ __('Bukti Faktur') }}</label>
+                        <a href="#" id="detail-bukti" target="_blank">Lihat bukti</a>
                     </div>
                     <div class="form-group">
                         <label>{{ __('Distributor') }}</label>
@@ -471,6 +480,10 @@
                     $('#detail-total-bayar').html(new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(data.total_bayar))
                     $('#detail-supplier-id').html(data.data_supplier.nama_perusahaan)
                     $('#detail-pesanan').html(data.data_surat_pesanan.kode_pesanan)
+
+                    // Set the href attribute of the detail-bukti link
+                    let url = '{{ url('/') }}'
+                    $('#detail-bukti').attr('href', `${url}/${data.bukti_path}/${data.bukti}`).text('Lihat bukti');
 
                     var obatData = JSON.parse(data.obat);
                     var obatTable = '<table class="table table-bordered">';

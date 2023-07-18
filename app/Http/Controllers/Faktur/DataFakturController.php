@@ -12,6 +12,7 @@ use App\Models\Supplier\Supplier;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Yajra\DataTables\Facades\DataTables;
 use Carbon\Carbon;
 
@@ -43,18 +44,19 @@ class DataFakturController extends Controller
         $data = DataFaktur::with('data_obat', 'data_supplier', 'data_surat_pesanan')->get();
 
         $actions = '<button type="button" class="btn btn-info btn-xs detail-btn me-1" data-id="{{ $id }}" title="Detail">
-                        <i class="icon-eye"></i>
-                    </button>
-                    ';
+                    <i class="icon-eye"></i>
+                </button>
+                ';
+
         if (Auth::user()->can('edit obat')) {
             $actions .= '<button class="btn btn-xs btn-warning edit-btn me-1" data-id="{{ $id }}" title="Edit">
-                            <i class="icon-pencil"></i>
-                        </button>';
+                        <i class="icon-pencil"></i>
+                    </button>';
         }
         if (Auth::user()->can('delete obat')) {
             $actions .= '<button class="btn btn-xs btn-danger delete-btn me-1" data-id="{{ $id }}" title="Delete">
-                            <i class="icon-trash"></i>
-                        </button>';
+                        <i class="icon-trash"></i>
+                    </button>';
         }
         return DataTables::collection($data)
             ->addIndexColumn()
@@ -65,7 +67,13 @@ class DataFakturController extends Controller
             ->addColumn('last_modified', function ($item) {
                 return $item->last_modified;
             })
-            ->rawColumns(['last_modified', 'action'])
+            ->addColumn('bukti_path', function ($item) {
+                return $item->bukti_path;
+            })
+            ->addColumn('bukti', function ($item) {
+                return $item->bukti;
+            })
+            ->rawColumns(['last_modified', 'action', 'bukti_path', 'bukti'])
             ->toJson();
     }
 
@@ -89,6 +97,7 @@ class DataFakturController extends Controller
             'total_bayar' => 'required',
             'supplier_id' => 'required',
             'id_surat_pesanan' => 'required',
+            'bukti' => 'mimes:jpeg,jpg,png,pdf,doc,docx|max:2048',
         ]);
 
         if (!$validated) {
@@ -143,6 +152,30 @@ class DataFakturController extends Controller
             }
             $ref_kategori->obat = $obatData;
             $ref_kategori->save();
+
+            if ($request->hasFile('bukti')) {
+                $bukti = $request->file('bukti');
+                $bukti_name = $bukti->hashName();
+                $bukti_origin = $bukti->getClientOriginalName();
+                $bukti_type = $bukti->extension();
+                $bukti_size = $bukti->getSize();
+
+                $upload_bukti = $request->file('bukti')->storeAs(
+                    'faktur/bukti',
+                    $bukti_name,
+                    'public'
+                );
+
+                if ($upload_bukti) {
+                    $ref_kategori->bukti = $bukti_name;
+                    $ref_kategori->bukti_origin = $bukti_origin;
+                    $ref_kategori->bukti_path = 'storage/faktur/bukti';
+                    $ref_kategori->bukti_type = $bukti_type;
+                    $ref_kategori->bukti_size = $bukti_size;
+                    $ref_kategori->save();
+                }
+            }
+
 
             $result = [
                 'code' => 200,
@@ -209,6 +242,7 @@ class DataFakturController extends Controller
             'total_bayar' => 'required',
             'supplier_id' => 'required',
             'id_surat_pesanan' => 'required',
+            'bukti' => 'mimes:jpeg,jpg,png,pdf,doc,docx|max:2048',
         ]);
 
         if (!$validated) {
@@ -271,6 +305,42 @@ class DataFakturController extends Controller
             }
             $ref_kategori->obat = $obatData;
             $ref_kategori->save();
+
+            if ($request->hasFile('bukti')) {
+                $bukti = $request->file('bukti');
+                $bukti_name = $bukti->hashName();
+                $bukti_origin = $bukti->getClientOriginalName();
+                $bukti_type = $bukti->extension();
+                $bukti_size = $bukti->getSize();
+
+                $upload_bukti = $request->file('bukti')->storeAs(
+                    'faktur/bukti',
+                    $bukti_name,
+                    'public'
+                );
+
+                if ($upload_bukti) {
+                    if ($ref_kategori->bukti) {
+                        try {
+                            Storage::disk('public')->delete(str_replace('storage/', '', $ref_kategori->bukti_path).'/'.$ref_kategori->bukti);
+                        } catch (Exception $e) {
+                            $result = [
+                                'code' => 400,
+                                'status' => false,
+                                'message' => $e->getMessage()
+                            ];
+                            return response()->json($result, $result['code']);
+                        }
+                    }
+
+                    $ref_kategori->bukti = $bukti_name;
+                    $ref_kategori->bukti_origin = $bukti_origin;
+                    $ref_kategori->bukti_path = 'storage/faktur/bukti';
+                    $ref_kategori->bukti_type = $bukti_type;
+                    $ref_kategori->bukti_size = $bukti_size;
+                    $ref_kategori->save();
+                }
+            }
 
             $result = [
                 'code' => 200,
