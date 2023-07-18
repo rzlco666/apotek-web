@@ -295,6 +295,7 @@
 
             $('.select2').select2({
                 minimumInputLength: 0,
+                dropdownParent: $("#form-modal")
             });
 
             $('#tanggal-faktur').datepicker({

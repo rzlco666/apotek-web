@@ -185,6 +185,7 @@
         $(document).ready(function () {
             $('.select2').select2({
                 minimumInputLength: 0,
+                dropdownParent: $("#form-modal")
             });
 
             var datatable = $('#datatable').DataTable({
