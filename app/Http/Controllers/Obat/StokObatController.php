@@ -33,17 +33,34 @@ class StokObatController extends Controller
         $data = StokObat::with('category_obat', 'exp_obat', 'in_obat', 'out_obat')->get();
 
         $actions = '
-                    <button type="button" class="btn btn-info btn-xs detail-btn me-1" data-id="{{ $id }}" title="Detail">
-                        <i class="icon-eye"></i>
-                    </button>
-                    ';
-        return DataTables::collection($data)
+        <button type="button" class="btn btn-info btn-xs detail-btn me-1" data-id="{{ $id }}" title="Detail">
+            <i class="icon-eye"></i>
+        </button>
+    ';
+
+        $datatable = DataTables::collection($data)
             ->addIndexColumn()
-            ->addColumn(
-                'action',
-                $actions
-            )
+            ->addColumn('action', $actions)
+            ->addColumn('sisa_stok', function ($row) {
+                $total_jumlah_in = $row->in_obat->total_jumlah_in ?? 0;
+                $total_jumlah_out = $row->out_obat->total_jumlah_out ?? 0;
+                $sisa_stok = $total_jumlah_in - $total_jumlah_out;
+
+                return $sisa_stok;
+            })
+            ->addColumn('total_jumlah_in', function ($row) {
+                return $row->in_obat->total_jumlah_in ?? '-';
+            })
+            ->addColumn('total_jumlah_out', function ($row) {
+                return $row->out_obat->total_jumlah_out ?? '-';
+            })
+            ->editColumn('exp_obat.tanggal_kadaluwarsa', function ($row) {
+                return $row->exp_obat->tanggal_kadaluwarsa ?? '-';
+            })
+            ->rawColumns(['action'])
             ->toJson();
+
+        return $datatable;
     }
 
     /**
