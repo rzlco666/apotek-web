@@ -293,6 +293,7 @@
 
             $('#tanggal-faktur').datepicker({
                 language: 'en',
+                maxDate: new Date()
                 //format: 'yyyy-mm-dd',
                 //minDate: new Date() // Now can select only dates, which goes after today
             })
